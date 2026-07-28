@@ -1,0 +1,26 @@
+{
+  "name": "GodMode-azure",
+  "version": "1.0.0",
+  "description": "GodMode AiTM Framework - Azure Web App Deployment",
+  "main": "proxy_server.js",
+  "scripts": {
+    "start": "node proxy_server.js",
+    "dev": "node proxy_server.js"
+  },
+  "engines": {
+    "node": ">=22.15.0"
+  },
+   "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "keywords": [
+    "GodMode",
+    "GodMode",
+    "service-worker",
+    "proxy"
+  ],
+  "author": "GodMode",
+  "license": "BSD-2-Clause",
+  "repository": "https://github.com/Ahaz1701/EvilWorker.git"
+}
+

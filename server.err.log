@@ -1,0 +1,5 @@
+[security] AUTO-BANNED IP: ::ffff:193.32.162.28 — reason: missing_accept_language (5 strikes)
+[device-ban] Banned device: a96c94cddad0... reason: header:bot_user_agent:curl
+[honeypot] TRAPPED IP: ::ffff:142.93.199.16 — reason: header:bot_user_agent:curl
+[device-ban] Banned device: 2825f9abc4a4... reason: header:bot_user_agent:curl
+[honeypot] TRAPPED IP: ::ffff:165.154.134.19 — reason: header:bot_user_agent:curl

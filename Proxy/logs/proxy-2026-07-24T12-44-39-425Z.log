@@ -1,0 +1,2 @@
+[2026-07-24T15:01:07.397Z] [ENDPOINT_PERSONAL] Personal endpoint accessed | {"url":"/p?test=1","clientIP":"::ffff:127.0.0.1","fromHost":"127.0.0.1:3001"}
+[2026-07-24T15:01:07.397Z] [ENDPOINT_PERSONAL_REDIRECT] Redirecting to personal login endpoint | {"fromURL":"/p?test=1","toURL":"/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F","clientIP":"::ffff:127.0.0.1"}

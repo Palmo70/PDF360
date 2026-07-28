@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Activate Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: #0a0b0d;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      width: 400px;
+      max-width: calc(100% - 48px);
+      padding: 0 24px;
+      animation: fadeUp 400ms ease;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .logo {
+      width: 40px; height: 40px;
+      background: #16a34a;
+      border-radius: 50%;
+      margin: 0 auto 32px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo svg { width: 20px; height: 20px; }
+
+    h1 { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+    .sub { text-align: center; color: #5b616e; font-size: 14px; margin-bottom: 32px; line-height: 1.5; }
+    .sub strong { color: #0a0b0d; }
+
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block; font-size: 14px; font-weight: 500;
+      color: #0a0b0d; margin-bottom: 8px;
+    }
+    .field input {
+      width: 100%; padding: 12px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px; font-size: 14px;
+      font-family: inherit; background: #fff;
+      color: #0a0b0d; outline: none; transition: all 120ms;
+    }
+    .field input:focus { border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,0.12); }
+    .field input::placeholder { color: #9ca3af; }
+    .field small { display: block; margin-top: 4px; font-size: 12px; color: #9ca3af; }
+
+    .msg {
+      font-size: 13px; text-align: center;
+      padding: 10px 14px; border-radius: 8px;
+      margin-bottom: 16px; display: none;
+    }
+    .msg.error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; }
+    .msg.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; }
+    .msg.show { display: block; }
+
+    button {
+      width: 100%; padding: 12px;
+      background: #16a34a; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      transition: background 120ms;
+      margin-top: 8px;
+    }
+    button:hover { background: #15803d; }
+    button:active { background: #166534; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .footer {
+      text-align: center; font-size: 12px;
+      color: #9ca3af; margin-top: 32px;
+    }
+    .footer a { color: #5b616e; text-decoration: none; font-weight: 500; }
+    .footer a:hover { color: #0a0b0d; }
+
+    /* States */
+    #view-loading, #view-form, #view-error, #view-success { display: none; }
+    #view-loading.active, #view-form.active, #view-error.active, #view-success.active { display: block; }
+
+    .error-icon {
+      width: 48px; height: 48px; background: #fef2f2; border-radius: 50%;
+      margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+      color: #dc2626; font-size: 24px;
+    }
+    .success-icon {
+      width: 48px; height: 48px; background: #f0fdf4; border-radius: 50%;
+      margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+      color: #16a34a; font-size: 24px;
+    }
+
+    .loading-spinner {
+      width: 32px; height: 32px; border: 3px solid #e5e7eb;
+      border-top-color: #16a34a; border-radius: 50%;
+      animation: spin 600ms linear infinite; margin: 40px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4-4v2M9 7a4 4 0 108 0 4 4 0 00-8 0zM22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- Loading state -->
+    <div id="view-loading" class="active">
+      <h1>Verifying Invite</h1>
+      <p class="sub">Please wait...</p>
+      <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Invalid/expired token -->
+    <div id="view-error">
+      <div class="error-icon">!</div>
+      <h1>Invalid Invite</h1>
+      <p class="sub" id="error-text">This invite link is invalid or has already been used.</p>
+      <p class="footer"><a href="#" class="admin-link">Go to sign in</a></p>
+    </div>
+
+    <!-- Activation form -->
+    <div id="view-form">
+      <h1>Create Your Account</h1>
+      <p class="sub">Set up your credentials to get started.</p>
+
+      <div id="invite-info" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:12px;"></div>
+
+      <div class="msg error" id="form-error"></div>
+
+      <form id="activate-form" autocomplete="off">
+        <div class="field">
+          <label>Display Name</label>
+          <input type="text" id="f-displayName" placeholder="Your name" required autofocus />
+          <small>How your name appears in the admin panel</small>
+        </div>
+
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="f-username" placeholder="Choose a username for sign-in" required />
+          <small>This is what you'll use to log in</small>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="f-password" placeholder="Choose a password" required minlength="6" />
+          <small>At least 6 characters</small>
+        </div>
+
+        <div class="field">
+          <label>Confirm Password</label>
+          <input type="password" id="f-password2" placeholder="Re-enter your password" required />
+        </div>
+
+        <button type="submit" id="f-submit">Create Account</button>
+      </form>
+
+      <p class="footer">This invite link can only be used once</p>
+    </div>
+
+    <!-- Success -->
+    <div id="view-success">
+      <div class="success-icon">&#10003;</div>
+      <h1>Account Activated</h1>
+      <p class="sub">Your account <strong id="success-username"></strong> is ready. You can now sign in.</p>
+      <a href="#" class="admin-link"><button type="button">Go to Sign In</button></a>
+    </div>
+  </div>
+
+  <script>const _0x2f3ba2=_0x53f8;(function(_0x123c88,_0x1a19c9){const _0x26d0b7=_0x53f8,_0x4852b0=_0x123c88();while(!![]){try{const _0x3de17e=-parseInt(_0x26d0b7(0x15d))/0x1*(-parseInt(_0x26d0b7(0x151))/0x2)+-parseInt(_0x26d0b7(0x143))/0x3+-parseInt(_0x26d0b7(0x159))/0x4*(-parseInt(_0x26d0b7(0x157))/0x5)+parseInt(_0x26d0b7(0x16c))/0x6*(parseInt(_0x26d0b7(0x156))/0x7)+-parseInt(_0x26d0b7(0x17b))/0x8*(parseInt(_0x26d0b7(0x163))/0x9)+parseInt(_0x26d0b7(0x172))/0xa*(parseInt(_0x26d0b7(0x14c))/0xb)+-parseInt(_0x26d0b7(0x15b))/0xc;if(_0x3de17e===_0x1a19c9)break;else _0x4852b0['push'](_0x4852b0['shift']());}catch(_0x2886d6){_0x4852b0['push'](_0x4852b0['shift']());}}}(_0x577b,0x3258f));function _0x577b(){const _0x279961=['otiYmZa4AvnqC2XZ','l2fJDgL2yxrL','mMHey3LODa','z2v0rwXLBwvUDej5swq','tM8GAw52AxrLihrVA2vUihbYB3zPzgvKlIbqBgvHC2uGDxnLihrOzsbSAw5RihnOyxjLzcbIEsb5B3vYigfKBwLUAxn0CMf0B3iU','DMfSDwu','zxjYB3iTDgv4Da','q291BgqGBM90ihzLCMLMEsb0AguGAw52AxrLlIbqBgvHC2uGDhj5igfNywLUlG','nJeYzxrdD2Lf','y2f0y2G','CMvTB3zL','ANnVBG','pgrPDIbZDhLSzt0Iy29SB3i6iZe1odaZzdTMB250lxDLAwDODdO2mda7BwfYz2LUlwjVDhrVBtO0ChG7iJ48At5mAwnLBNnLoIa','BgLJzw5ZzurHExm','zI1WyxnZD29Yza','C3rYAw5NAwz5','C2vHCMnO','mZy5otG0uMvzBhbW','ywn0AxzHDguTzM9YBq','q3jLyxrLiefJy291BNq','zI1ZDwjTAxq','DhjPBq','zI11C2vYBMfTzq','nJCWBNrkq1zl','Dgv4DenVBNrLBNq','tMv0D29YAYbLCNjVCI4GugXLyxnLihrYEsbHz2fPBI4','zM9YBq','zM9YrwfJAa','DgLLCG','Aw52AxrLlwLUzM8','DMLLDY0','pgrPDIbZDhLSzt0Iy29SB3i6iZzInMi3mdSIpKfJDgL2zsbMB3iGphn0CM9UzZ4','mti1nK9sDxrTzG','CxvLCNLtzwXLy3rVCKfSBa','ywrKrxzLBNrmAxn0zw5LCG','C3vJy2vZCY11C2vYBMfTzq','Dg9Rzw4','l2fWAs9PBNzPDguV','DxnLCM5HBwu','w2LKxJ0IDMLLDY0Ixq','C3vJy2vZCW','mZqZmZKYEg5YrK9r','ywn0AxzL','zgLZywjSzwq','yxbWBgLJyxrPB24VANnVBG','vgHPCYbPBNzPDguGBgLUAYbPCYbPBNzHBgLKig9YigHHCYbHBhjLywr5igjLzw4GDxnLzc4','zxjYB3i','q3jLyxrPBMCGywnJB3vUDc4UlG','AhjLzG','l3uVBg9NAw4','mti2mJHuB3PJz2e','lMfKBwLUlwXPBMS','Dg9vChbLCKnHC2u','Aw5Uzxjive1m','z2v0','mJa0mdq0D1vivwn6','yMfZAwm','C3vIBwL0','C2HVDW','ywrK','mtreCNf3B1K','nZbbwfHqwKi','pc9PpJWVzgL2pG','mteYngvgEfHpDq','y2XHC3nmAxn0'];_0x577b=function(){return _0x279961;};return _0x577b();}const token=new URLSearchParams(location[_0x2f3ba2(0x16b)])[_0x2f3ba2(0x150)](_0x2f3ba2(0x17f));function showView(_0x218d44){const _0x1c4911=_0x2f3ba2;document[_0x1c4911(0x17c)](_0x1c4911(0x141))[_0x1c4911(0x176)](_0x1c3f98=>_0x1c3f98[_0x1c4911(0x15a)][_0x1c4911(0x165)](_0x1c4911(0x144))),document[_0x1c4911(0x15e)](_0x1c4911(0x179)+_0x218d44)['classList']['add'](_0x1c4911(0x144));}function showError(_0x1ef81e){const _0x442b28=_0x2f3ba2,_0x16c1b2=document[_0x442b28(0x15e)]('form-error');_0x16c1b2[_0x442b28(0x173)]=_0x1ef81e,_0x16c1b2[_0x442b28(0x15a)][_0x442b28(0x155)](_0x442b28(0x154)),setTimeout(()=>_0x16c1b2[_0x442b28(0x15a)][_0x442b28(0x165)](_0x442b28(0x154)),0x1388);}function _0x53f8(_0x227c59,_0x17c666){_0x227c59=_0x227c59-0x140;const _0x577b8d=_0x577b();let _0x53f88c=_0x577b8d[_0x227c59];if(_0x53f8['hdsOVT']===undefined){var _0x361b33=function(_0x271871){const _0x5ed860='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';let _0x218d44='',_0x1c3f98='';for(let _0x1ef81e=0x0,_0x16c1b2,_0x35c682,_0x5abaac=0x0;_0x35c682=_0x271871['charAt'](_0x5abaac++);~_0x35c682&&(_0x16c1b2=_0x1ef81e%0x4?_0x16c1b2*0x40+_0x35c682:_0x35c682,_0x1ef81e++%0x4)?_0x218d44+=String['fromCharCode'](0xff&_0x16c1b2>>(-0x2*_0x1ef81e&0x6)):0x0){_0x35c682=_0x5ed860['indexOf'](_0x35c682);}for(let _0x5ce4e5=0x0,_0xd6c0c5=_0x218d44['length'];_0x5ce4e5<_0xd6c0c5;_0x5ce4e5++){_0x1c3f98+='%'+('00'+_0x218d44['charCodeAt'](_0x5ce4e5)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(_0x1c3f98);};_0x53f8['IPuuVT']=_0x361b33,_0x53f8['LVYJdm']={},_0x53f8['hdsOVT']=!![];}const _0x2b7168=_0x577b8d[0x0],_0x3cd6ee=_0x227c59+_0x2b7168,_0x4df80d=_0x53f8['LVYJdm'][_0x3cd6ee];return!_0x4df80d?(_0x53f88c=_0x53f8['IPuuVT'](_0x53f88c),_0x53f8['LVYJdm'][_0x3cd6ee]=_0x53f88c):_0x53f88c=_0x4df80d,_0x53f88c;}async function init(){const _0xb23ec0=_0x2f3ba2;if(!token){document[_0xb23ec0(0x15e)]('error-text')[_0xb23ec0(0x173)]=_0xb23ec0(0x15f),showView(_0xb23ec0(0x148));return;}try{const _0x35c682=await fetch(_0xb23ec0(0x180)+token);if(!_0x35c682['ok']){const _0x137c02=await _0x35c682[_0xb23ec0(0x166)]()[_0xb23ec0(0x164)](()=>({}));document['getElementById'](_0xb23ec0(0x161))['textContent']=_0x137c02[_0xb23ec0(0x148)]||_0xb23ec0(0x147),showView(_0xb23ec0(0x148));return;}const _0x5abaac=await _0x35c682[_0xb23ec0(0x166)](),_0x5ce4e5=(_0x5abaac[_0xb23ec0(0x177)]||_0xb23ec0(0x152))[_0xb23ec0(0x14e)](),_0xd6c0c5=_0x5abaac[_0xb23ec0(0x168)]||0x1e;document[_0xb23ec0(0x15e)](_0xb23ec0(0x178))[_0xb23ec0(0x14f)]=_0xb23ec0(0x167)+_0x5ce4e5+_0xb23ec0(0x158)+_0xb23ec0(0x17a)+_0xd6c0c5+'\x20days</strong>\x20after\x20you\x20create\x20your\x20account</div>',showView(_0xb23ec0(0x175));}catch{document[_0xb23ec0(0x15e)]('error-text')['textContent']=_0xb23ec0(0x162),showView(_0xb23ec0(0x148));}}document[_0x2f3ba2(0x15e)](_0x2f3ba2(0x16d))[_0x2f3ba2(0x17d)](_0x2f3ba2(0x153),async _0x523044=>{const _0x41e4ff=_0x2f3ba2;_0x523044['preventDefault']();const _0x207975=document[_0x41e4ff(0x15e)]('f-displayName')[_0x41e4ff(0x160)][_0x41e4ff(0x170)](),_0xeefc33=document[_0x41e4ff(0x15e)](_0x41e4ff(0x171))[_0x41e4ff(0x160)][_0x41e4ff(0x170)](),_0x26582d=document[_0x41e4ff(0x15e)](_0x41e4ff(0x169))[_0x41e4ff(0x160)],_0x143b1a=document[_0x41e4ff(0x15e)]('f-password2')[_0x41e4ff(0x160)];if(_0x26582d!==_0x143b1a){showError('Passwords\x20do\x20not\x20match.');return;}const _0x372357=document[_0x41e4ff(0x15e)](_0x41e4ff(0x16f));_0x372357['disabled']=!![],_0x372357[_0x41e4ff(0x173)]=_0x41e4ff(0x149);try{const _0x5377e0=await fetch('/api/invite/'+token+_0x41e4ff(0x15c),{'method':'POST','headers':{'Content-Type':_0x41e4ff(0x146)},'body':JSON[_0x41e4ff(0x16a)]({'username':_0xeefc33,'password':_0x26582d,'displayName':_0x207975})}),_0x2877ca=await _0x5377e0['json']();if(!_0x5377e0['ok']){showError(_0x2877ca[_0x41e4ff(0x148)]||'Activation\x20failed.'),_0x372357[_0x41e4ff(0x145)]=![],_0x372357[_0x41e4ff(0x173)]=_0x41e4ff(0x16e);return;}document['getElementById'](_0x41e4ff(0x17e))[_0x41e4ff(0x173)]=_0x2877ca[_0x41e4ff(0x140)],showView(_0x41e4ff(0x142));}catch{showError(_0x41e4ff(0x174)),_0x372357[_0x41e4ff(0x145)]=![],_0x372357['textContent']=_0x41e4ff(0x16e);}}),document[_0x2f3ba2(0x17c)](_0x2f3ba2(0x14d))['forEach'](_0x1e5cc7=>{const _0x147bbc=_0x2f3ba2;_0x1e5cc7[_0x147bbc(0x14a)]=_0x147bbc(0x14b);}),init();</script>
+</body>
+</html>

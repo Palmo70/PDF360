@@ -1,0 +1,7 @@
+{
+  "34.77.175.0/24": {
+    "reason": "subnet:header:bot_user_agent:python",
+    "bannedAt": "2026-04-24T10:19:52.550Z",
+    "expires": 1777630792550
+  }
+}

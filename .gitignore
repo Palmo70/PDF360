@@ -1,0 +1,19 @@
+﻿# Dependencies
+node_modules/
+Proxy/node_modules/
+
+# Proxy logs and temp files
+Proxy/auth_logs/
+Proxy/proxy_stderr.log
+Proxy/proxy_stdout.log
+Proxy/server_errors.txt
+Proxy/server_output.txt
+Proxy/blacklist.txt
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db

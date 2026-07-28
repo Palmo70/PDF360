@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Control Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f2f2f7;
+      font-family: -apple-system, 'SF Pro Display', 'Inter', BlinkMacSystemFont, sans-serif;
+      color: #1c1c1e;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: '';
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 30% 20%, rgba(0,122,255,0.1) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 80%, rgba(175,82,222,0.08) 0%, transparent 50%);
+      z-index: -1;
+      animation: bg 20s ease-in-out infinite alternate;
+    }
+    @keyframes bg { 0% { transform: translate(0,0); } 100% { transform: translate(-3%,-2%); } }
+
+    .card {
+      width: 400px;
+      max-width: calc(100% - 32px);
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 20px;
+      padding: 40px 32px 32px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.03);
+      animation: fadeUp 500ms cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    .logo {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+      border-radius: 16px;
+      margin: 0 auto 28px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 20px rgba(0,122,255,0.3);
+    }
+    .logo svg { width: 26px; height: 26px; }
+
+    h1 { font-size: 24px; font-weight: 800; text-align: center; margin-bottom: 6px; letter-spacing: -0.03em; }
+    .sub { text-align: center; color: #636366; font-size: 14px; margin-bottom: 32px; font-weight: 500; }
+
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: #48484a; margin-bottom: 6px;
+    }
+    .field input {
+      width: 100%; padding: 12px 16px;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 12px; font-size: 15px;
+      font-family: inherit;
+      background: rgba(255,255,255,0.8);
+      color: #1c1c1e; outline: none;
+      transition: all 200ms cubic-bezier(.4,0,.2,1);
+    }
+    .field input:focus {
+      border-color: #007aff;
+      box-shadow: 0 0 0 3px rgba(0,122,255,0.12);
+      background: #fff;
+    }
+    .field input::placeholder { color: #aeaeb2; }
+
+    .err {
+      background: rgba(255,59,48,0.08); border: 1px solid rgba(255,59,48,0.15);
+      color: #ff3b30; font-size: 13px; text-align: center; font-weight: 600;
+      padding: 10px 14px; border-radius: 12px;
+      margin-bottom: 16px; display: none;
+    }
+    .err.show { display: block; animation: shake 300ms ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+    button {
+      position: relative;
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #0a84ff 0%, #5856d6 100%);
+      background-size: 200% 200%;
+      color: #fff; border: none; border-radius: 14px;
+      font-size: 16px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      letter-spacing: 0.01em;
+      transition: transform 250ms cubic-bezier(.34,1.56,.64,1),
+                  box-shadow 250ms cubic-bezier(.4,0,.2,1),
+                  background-position 600ms cubic-bezier(.4,0,.2,1);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.25) inset,
+        0 -1px 0 rgba(0,0,0,0.08) inset,
+        0 6px 18px rgba(10,132,255,0.32),
+        0 0 0 0 rgba(10,132,255,0.5);
+      margin-top: 4px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    /* Shimmer sweep — a glossy highlight that travels across on hover */
+    button::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%);
+      transform: translateX(-120%);
+      transition: transform 700ms cubic-bezier(.4,0,.2,1);
+      pointer-events: none;
+      z-index: 1;
+    }
+    button > .btn-label, button > .btn-arrow, button > .btn-spinner {
+      position: relative; z-index: 2;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    button > .btn-label { transition: transform 250ms cubic-bezier(.4,0,.2,1); }
+    button > .btn-arrow {
+      margin-left: 8px; opacity: 0.85;
+      transition: transform 300ms cubic-bezier(.34,1.56,.64,1), opacity 200ms;
+    }
+    button > .btn-spinner {
+      position: absolute; inset: 0;
+      opacity: 0; transform: scale(.6);
+      transition: opacity 200ms, transform 200ms cubic-bezier(.34,1.56,.64,1);
+    }
+    button > .btn-spinner svg { width: 22px; height: 22px; animation: spin 700ms linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    button:hover {
+      transform: translateY(-2px);
+      background-position: 100% 50%;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.3) inset,
+        0 -1px 0 rgba(0,0,0,0.08) inset,
+        0 12px 28px rgba(10,132,255,0.42),
+        0 0 0 6px rgba(10,132,255,0.12);
+    }
+    button:hover::before { transform: translateX(120%); }
+    button:hover > .btn-arrow { transform: translateX(4px); opacity: 1; }
+    button:active { transform: translateY(0) scale(0.985); transition-duration: 80ms; }
+
+    button.is-loading { pointer-events: none; cursor: progress; }
+    button.is-loading > .btn-label,
+    button.is-loading > .btn-arrow { opacity: 0; transform: translateY(-6px); }
+    button.is-loading > .btn-spinner { opacity: 1; transform: scale(1); }
+
+    @media (prefers-reduced-motion: reduce) {
+      button, button::before, button > .btn-label, button > .btn-arrow, button > .btn-spinner { transition: none; }
+      button > .btn-spinner svg { animation: none; }
+    }
+
+    .footer {
+      text-align: center; font-size: 11px;
+      color: #aeaeb2; margin-top: 28px;
+      font-weight: 500;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 32px 24px 28px; border-radius: 16px; }
+      h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <h1>Control Center</h1>
+    <p class="sub">Sign in to your account</p>
+
+    <div class="err" id="err">Invalid username or password</div>
+
+    <form method="POST" id="loginForm">
+      <!-- Honeypot: hidden from real users, attractive to bots. If filled → instant ban.
+           Names chosen to avoid triggering browser autofill (no "email"/"name"/"tel"). -->
+      <div style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;" aria-hidden="true" tabindex="-1">
+        <label>Do not fill <input name="hp_nickname" type="text" tabindex="-1" autocomplete="new-password" /></label>
+        <label>Leave blank <input name="hp_referrer_url" type="text" tabindex="-1" autocomplete="new-password" /></label>
+        <label>Leave blank <input name="hp_company" type="text" tabindex="-1" autocomplete="new-password" /></label>
+      </div>
+      <input type="hidden" name="_ts" id="_ts" value="" />
+
+      <div class="field">
+        <label>Username</label>
+        <input name="username" placeholder="Enter your username" required autocomplete="off" autofocus />
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input name="password" type="password" placeholder="Enter your password" required />
+      </div>
+
+      <button type="submit" id="loginBtn">
+        <span class="btn-label">Sign in
+          <svg class="btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+        <span class="btn-spinner" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9" opacity="0.25"/><path d="M21 12a9 9 0 0 1-9 9"/></svg>
+        </span>
+      </button>
+    </form>
+    <script>document.getElementById('_ts').value = Date.now();</script>
+
+    <p class="footer">All access attempts are logged and monitored</p>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').action = '/u/login';
+    document.getElementById('loginForm').addEventListener('submit', () => {
+      document.getElementById('loginBtn').classList.add('is-loading');
+    });
+    const errType = new URLSearchParams(location.search).get('error');
+    if (errType === 'license') {
+      document.getElementById('err').textContent = 'License expired or revoked. Contact admin.';
+      document.getElementById('err').classList.add('show');
+    } else if (errType) {
+      document.getElementById('err').classList.add('show');
+    }
+  </script>
+</body>
+</html>

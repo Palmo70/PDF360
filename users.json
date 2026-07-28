@@ -1,0 +1,40 @@
+[
+  {
+    "id": "u_9aef4935",
+    "slug": "0f32a23486",
+    "username": "go",
+    "displayName": "Super Admin",
+    "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$HN2n/D78yUgJzMjGQISLLw$CZZvys4NIK25ZOvC3SJ9+duJwtQXeqpy0V0J3dWqSQU",
+    "role": "superadmin",
+    "mfaEnabled": true,
+    "assignedEmails": [],
+    "assignedDomains": [],
+    "createdAt": "2026-04-12T21:26:39.259Z",
+    "updatedAt": "2026-04-12T21:26:39.260Z",
+    "telegramBotToken": "7405272455:AAHmoxjlVkxxbb0wYrb9U1gO5TgSEdiOadI",
+    "telegramChatId": "1412104349",
+    "telegramEnabled": true,
+    "slugSecret": "f4f65dada1afd709e5574e5b1ddd14a1520c3773c3ff611630e9b79155adf268",
+    "relayToken": "1578c31cf8dbf6c160f429a03cb22801",
+    "domain": "",
+    "domainVerified": false,
+    "domainSslStatus": "",
+    "domainVerifyToken": "304025f27aaf804c0fa4c1e3",
+    "encryptionPreset": "medium",
+    "frontDomain": "",
+    "license": {
+      "key": "OWNER",
+      "tier": "owner",
+      "active": true,
+      "expiresAt": null,
+      "createdAt": "2026-04-23T11:16:37.018Z"
+    },
+    "features": {
+      "chameleon": true,
+      "inbox": true,
+      "convert": true,
+      "links": true
+    },
+    "requireDomain": false
+  }
+]

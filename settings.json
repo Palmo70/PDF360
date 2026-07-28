@@ -1,0 +1,5 @@
+{
+  "maxPasswordAttempts": 3,
+  "lockoutMinutes": 15,
+  "adminPath": "007460494dd4"
+}

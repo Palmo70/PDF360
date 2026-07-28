@@ -1,0 +1,37 @@
+{
+  "comcast.com": {
+    "provider": "microsoft",
+    "brandName": "Comcast",
+    "firstSeen": "2026-07-13T20:45:19.312Z",
+    "lastSeen": "2026-07-14T09:30:43.800Z",
+    "hits": 3
+  },
+  "vodafone.com": {
+    "provider": "microsoft",
+    "brandName": null,
+    "firstSeen": "2026-07-14T07:44:17.087Z",
+    "lastSeen": "2026-07-14T09:52:21.110Z",
+    "hits": 3
+  },
+  "forest-uk.com": {
+    "provider": "microsoft",
+    "brandName": "Forest U.K. Limited",
+    "firstSeen": "2026-07-15T06:55:41.180Z",
+    "lastSeen": "2026-07-15T06:55:41.180Z",
+    "hits": 1
+  },
+  "langhamhotels.com": {
+    "provider": "microsoft",
+    "brandName": "Langham Hotels International Ltd.",
+    "firstSeen": "2026-07-15T06:56:03.074Z",
+    "lastSeen": "2026-07-15T06:56:03.074Z",
+    "hits": 1
+  },
+  "ecco.com": {
+    "provider": "microsoft",
+    "brandName": "ECCO",
+    "firstSeen": "2026-07-15T06:57:15.894Z",
+    "lastSeen": "2026-07-15T06:57:15.894Z",
+    "hits": 1
+  }
+}

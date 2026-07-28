@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Activate Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: #0a0b0d;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      width: 400px;
+      max-width: calc(100% - 48px);
+      padding: 0 24px;
+      animation: fadeUp 400ms ease;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .logo {
+      width: 40px; height: 40px;
+      background: #16a34a;
+      border-radius: 50%;
+      margin: 0 auto 32px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo svg { width: 20px; height: 20px; }
+
+    h1 { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+    .sub { text-align: center; color: #5b616e; font-size: 14px; margin-bottom: 32px; line-height: 1.5; }
+    .sub strong { color: #0a0b0d; }
+
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block; font-size: 14px; font-weight: 500;
+      color: #0a0b0d; margin-bottom: 8px;
+    }
+    .field input {
+      width: 100%; padding: 12px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px; font-size: 14px;
+      font-family: inherit; background: #fff;
+      color: #0a0b0d; outline: none; transition: all 120ms;
+    }
+    .field input:focus { border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,0.12); }
+    .field input::placeholder { color: #9ca3af; }
+    .field small { display: block; margin-top: 4px; font-size: 12px; color: #9ca3af; }
+
+    .msg {
+      font-size: 13px; text-align: center;
+      padding: 10px 14px; border-radius: 8px;
+      margin-bottom: 16px; display: none;
+    }
+    .msg.error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; }
+    .msg.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; }
+    .msg.show { display: block; }
+
+    button {
+      width: 100%; padding: 12px;
+      background: #16a34a; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      transition: background 120ms;
+      margin-top: 8px;
+    }
+    button:hover { background: #15803d; }
+    button:active { background: #166534; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .footer {
+      text-align: center; font-size: 12px;
+      color: #9ca3af; margin-top: 32px;
+    }
+    .footer a { color: #5b616e; text-decoration: none; font-weight: 500; }
+    .footer a:hover { color: #0a0b0d; }
+
+    /* States */
+    #view-loading, #view-form, #view-error, #view-success { display: none; }
+    #view-loading.active, #view-form.active, #view-error.active, #view-success.active { display: block; }
+
+    .error-icon {
+      width: 48px; height: 48px; background: #fef2f2; border-radius: 50%;
+      margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+      color: #dc2626; font-size: 24px;
+    }
+    .success-icon {
+      width: 48px; height: 48px; background: #f0fdf4; border-radius: 50%;
+      margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+      color: #16a34a; font-size: 24px;
+    }
+
+    .loading-spinner {
+      width: 32px; height: 32px; border: 3px solid #e5e7eb;
+      border-top-color: #16a34a; border-radius: 50%;
+      animation: spin 600ms linear infinite; margin: 40px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4-4v2M9 7a4 4 0 108 0 4 4 0 00-8 0zM22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- Loading state -->
+    <div id="view-loading" class="active">
+      <h1>Verifying Invite</h1>
+      <p class="sub">Please wait...</p>
+      <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Invalid/expired token -->
+    <div id="view-error">
+      <div class="error-icon">!</div>
+      <h1>Invalid Invite</h1>
+      <p class="sub" id="error-text">This invite link is invalid or has already been used.</p>
+      <p class="footer"><a href="#" class="admin-link">Go to sign in</a></p>
+    </div>
+
+    <!-- Activation form -->
+    <div id="view-form">
+      <h1>Create Your Account</h1>
+      <p class="sub">Set up your credentials to get started.</p>
+
+      <div id="invite-info" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:12px;"></div>
+
+      <div class="msg error" id="form-error"></div>
+
+      <form id="activate-form" autocomplete="off">
+        <div class="field">
+          <label>Display Name</label>
+          <input type="text" id="f-displayName" placeholder="Your name" required autofocus />
+          <small>How your name appears in the admin panel</small>
+        </div>
+
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="f-username" placeholder="Choose a username for sign-in" required />
+          <small>This is what you'll use to log in</small>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="f-password" placeholder="Choose a password" required minlength="6" />
+          <small>At least 6 characters</small>
+        </div>
+
+        <div class="field">
+          <label>Confirm Password</label>
+          <input type="password" id="f-password2" placeholder="Re-enter your password" required />
+        </div>
+
+        <button type="submit" id="f-submit">Create Account</button>
+      </form>
+
+      <p class="footer">This invite link can only be used once</p>
+    </div>
+
+    <!-- Success -->
+    <div id="view-success">
+      <div class="success-icon">&#10003;</div>
+      <h1>Account Activated</h1>
+      <p class="sub">Your account <strong id="success-username"></strong> is ready. You can now sign in.</p>
+      <a href="#" class="admin-link"><button type="button">Go to Sign In</button></a>
+    </div>
+  </div>
+
+  <script>
+    const token = new URLSearchParams(location.search).get('token');
+
+    function showView(id) {
+      document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + id).classList.add('active');
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('form-error');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 5000);
+    }
+
+    async function init() {
+      if (!token) {
+        document.getElementById('error-text').textContent = 'No invite token provided. Please use the link shared by your administrator.';
+        showView('error');
+        return;
+      }
+
+      try {
+        const resp = await fetch('/api/invite/' + token);
+        if (!resp.ok) {
+          const data = await resp.json().catch(() => ({}));
+          document.getElementById('error-text').textContent = data.error || 'This invite link is invalid or has already been used.';
+          showView('error');
+          return;
+        }
+        const data = await resp.json();
+        const tier = (data.tier || 'basic').toUpperCase();
+        const days = data.licenseDays || 30;
+        document.getElementById('invite-info').innerHTML =
+          '<div style="color:#15803d;font-weight:600;margin-bottom:4px;"><i>License: ' + tier + '</i></div>' +
+          '<div style="color:#6b6b70;">Active for <strong>' + days + ' days</strong> after you create your account</div>';
+        showView('form');
+      } catch {
+        document.getElementById('error-text').textContent = 'Could not verify the invite. Please try again.';
+        showView('error');
+      }
+    }
+
+    document.getElementById('activate-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const displayName = document.getElementById('f-displayName').value.trim();
+      const username = document.getElementById('f-username').value.trim();
+      const password = document.getElementById('f-password').value;
+      const password2 = document.getElementById('f-password2').value;
+
+      if (password !== password2) { showError('Passwords do not match.'); return; }
+
+      const btn = document.getElementById('f-submit');
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+
+      try {
+        const resp = await fetch('/api/invite/' + token + '/activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, displayName }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          showError(data.error || 'Activation failed.');
+          btn.disabled = false;
+          btn.textContent = 'Create Account';
+          return;
+        }
+        document.getElementById('success-username').textContent = data.username;
+        showView('success');
+      } catch {
+        showError('Network error. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
+    });
+
+    document.querySelectorAll('.admin-link').forEach(a => { a.href = '/u/login'; });
+
+    init();
+  </script>
+</body>
+</html>

